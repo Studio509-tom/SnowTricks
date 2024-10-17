@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon compte
+{% endblock %}
+
+{% block body %}
+
+	<div class="parent-account">
+		<div class="container">
+			<div class="row">
+				<div class="col-12 my-5 text-center">
+					<h1>Mon compte</h1>
+					<div class="my-5 personal-informations">
+						<div class="avatar-file-parent">
+							{% include "personal/avatar-partial.html.twig" %}
+						</div>
+						<form id="profile-picture-form" class="my-3">
+							<label for="file-upload" class="custom-file-upload">
+								Modifier mon avatar
+							</label>
+							<input id="file-upload" name="file-upload" type="file"/>
+						</form>
+						<p class="my-3">Email :
+							{{app.user.email}}</p>
+						{% for message in app.flashes('success') %}
+							<div class="alert alert-success">
+								{{ message }}
+							</div>
+						{% endfor %}
+						<a class="btn btn-light" href="{{path("app_change_password")}}">Modifier mon mots de passe</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

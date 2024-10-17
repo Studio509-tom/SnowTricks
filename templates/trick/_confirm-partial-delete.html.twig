@@ -1,0 +1,8 @@
+<div class="confirm-delete-partial">
+	<p>Êtes vous sur de vouloir supprimer cette article ?</p>
+	<div class="btn-modal-delete">
+		<button class="btn btn-light close-modal">Annuler</button>
+        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ trick.id) }}">
+		<button class="btn btn-light confirm-delete" data-url="{{ path('app_ajax_trick_delete', {'id': trick.id}) }}">Confirmer</button>
+	</div>
+</div>

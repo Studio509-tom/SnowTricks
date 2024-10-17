@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Trick
+{% endblock %}
+
+{% block body %}
+<div class="content-show-trick">
+	{% include "trick/show-partial.html.twig" %}
+</div>
+	
+<div class="comments-container">
+	{% include "trick/comments.html.twig" %}
+</div>
+{% endblock %}

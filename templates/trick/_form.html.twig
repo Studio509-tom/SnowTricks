@@ -1,0 +1,26 @@
+{{ form_start(form, { 'attr': { 'enctype': 'multipart/form-data' } }) }}
+{{ form_row(form.title) }}
+{{ form_row(form.content) }}
+{{ form_row(form.files)}}
+{% set value_form =  form.vars.value %}
+
+{{ form_row(form.links) }}
+<div class="parent-links"></div>
+<button class="btn btn-light add-links">Ajouter un lien</button>
+<div id="image-preview-existing">
+	{% if trick %}
+		{% if trick.files is not empty %}
+			{% for file in trick.files %}
+				<div class="img-wrap">
+					<span class="close-file">&times;</span>
+					<img class="file-upload" src="{{asset('files/tricks/' ~ trick.id ~ '/' ~ file )}}" alt="Image de trick" data-filename="{{ file }}">
+				</div>
+			{% endfor %}
+		{% endif %}
+	{% endif %}
+</div>
+
+<div id="image-preview"></div>
+<input id="submit-form-trick" type="submit" name="save" class="btn" value="{{ button_label|default('Save')}}">
+{{ form_rest(form) }}
+{{ form_end(form) }}

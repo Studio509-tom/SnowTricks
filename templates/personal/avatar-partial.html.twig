@@ -1,0 +1,6 @@
+
+{% if avatar_file is null %}
+		<img class="mb-3 avatar-file" src="{{asset('files/defaults/default-avatar.jpg')}}" alt="#">
+	{% else %}
+		<img class="mb-3 avatar-file" src="{{asset('files/users/' ~ app.user.id ~ '/' ~ avatar_file )}}" alt="#">
+	{% endif %}

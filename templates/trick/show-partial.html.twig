@@ -1,0 +1,42 @@
+<div class="container">
+	<div class="row">
+		<div class="show-trick-parent col-12">
+			<h1>{{trick.title}}</h1>
+			{% for file in trick.files %}
+				{% if loop.index == 1 %}
+					<div class="first-file">
+						<img src="{{asset('files/tricks/' ~ trick.id ~ '/' ~ file )}}" alt="Image du trick">
+					</div>
+				{% endif %}
+			{% endfor %}
+			<div class="file-other">
+				{% for file in trick.files %}
+					{% if loop.index > 1 %}
+						<img src="{{asset('files/tricks/' ~ trick.id ~ '/' ~ file )}}" alt="Image du trick">
+					{% endif %}
+				{% endfor %}
+			</div>
+
+			{% if trick.links %}
+				{% for link in trick.links %}
+					<div class="video-container">
+						{% if 'youtube.com' in link %}
+							<iframe width="560" height="315" src="{{ link | replace({'watch?v=': 'embed/'}) }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+						{% endif %}
+					</div>
+				{% endfor %}
+			{% endif %}
+			<div class="content-trick">
+				<p class="content">
+					{{ trick.content }}
+				</p>
+			</div>
+		</div>
+	</div>
+</div>
+<a class="btn btn-light" href="{{ path('app_trick_index') }}">Retour à la liste</a>
+{% if is_granted("IS_AUTHENTICATED") %}
+
+	<a class="btn btn-light edit-trick" href="{{ path('app_ajax_trick_edit', {'id': trick.id}) }}">Modifier</a>
+	<a class="btn btn-light delete-pop-up" href="{{ path('app_ajax_trick_delete', {'id': trick.id}) }}">Supprimer</a>
+</div>{% endif %}

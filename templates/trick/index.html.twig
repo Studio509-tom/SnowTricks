@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tricks
+{% endblock %}
+
+{% block body %}
+	<h1>Tricks</h1>
+	{% if is_granted("IS_AUTHENTICATED") %}
+
+		<a class="btn btn-light create-trick" href="{{ path('app_ajax_trick_new') }}">Nouveau tricks</a>
+	{% endif %}
+	<div class="tricks">
+		
+		{% include "trick/tricks-partial.html.twig" %}
+	</div>
+
+
+{% endblock %}

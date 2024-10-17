@@ -1,0 +1,77 @@
+{% for comment in comments %}
+	{% if number_comments is not defined %}
+		{% if loop.index <= 6 %}
+			<div class="comment-content-{{ comment.id }}">
+				<div class="comment">
+
+					{% for user in users %}
+						{% if user.getId() == comment.getUser().getId() %}
+							{% if user.getAvatarNameFile() is null %}
+								<img class="avatar-user" src="{{asset('files/defaults/default-avatar.jpg')}}" alt="">
+							{% else %}
+								<img class="avatar-user" src="{{asset('files/users/' ~ user.getId() ~ '/' ~ user.getAvatarNameFile() )}}" alt="">
+							{% endif %}
+						{% endif %}
+					{% endfor %}
+					{% if modify and comment.id == id_comment %}
+						{{ form_start(forms[comment.id]) }}
+						{{ form_widget(forms[comment.id]) }}
+						<button type="submit" class="submit-comment btn btn-light" name="send-comment" value="Envoyer" data-url="{{ path('app_ajax_comment_edit', {'id': comment.id}) }}">Valider</button>
+						{{ form_end(forms[comment.id]) }}
+
+					{% else %}
+
+						<p class="content-comment content-{{ comment.id }}">{{ comment.content }}</p>
+						{% if is_granted("IS_AUTHENTICATED") %}
+							<button class="modify-comment btn btn-light" data-comment="{{ comment.id }}" data-url="{{ path('app_ajax_comment_edit', {'id': comment.id}) }}">Modifier</button>
+						{% endif %}
+
+					{% endif %}
+
+					{% if is_granted("IS_AUTHENTICATED") %}
+
+						<a class="delete-pop-up btn btn-light" name="delete-pop-up" href="{{ path('app_ajax_comment_delete', {'id': comment.id}) }}">Supprimer</a>
+					{% endif %}
+
+				</div>
+			</div>
+		{% endif %}
+	{% else %}
+		{% if loop.index <= number_comments + 1 %}
+			<div class="comment-content-{{ comment.id }}">
+				<div class="comment">
+
+					{% for user in users %}
+						{% if user.getId() == comment.getUser().getId() %}
+							{% if user.getAvatarNameFile() is null %}
+								<img class="avatar-user" src="{{asset('files/defaults/default-avatar.jpg')}}" alt="">
+							{% else %}
+								<img class="avatar-user" src="{{asset('files/users/' ~ user.getId() ~ '/' ~ user.getAvatarNameFile() )}}" alt="">
+							{% endif %}
+						{% endif %}
+					{% endfor %}
+					{% if modify and comment.id == id_comment %}
+						{{ form_start(forms[comment.id]) }}
+						{{ form_widget(forms[comment.id]) }}
+						<button type="submit" class="submit-comment btn btn-light" name="send-comment" value="Envoyer" data-url="{{ path('app_ajax_comment_edit', {'id': comment.id}) }}">Valider</button>
+						{{ form_end(forms[comment.id]) }}
+
+					{% else %}
+
+						<p class="content-comment content-{{ comment.id }}">{{ comment.content }}</p>
+						{% if is_granted("IS_AUTHENTICATED") %}
+							<button class="modify-comment btn btn-light" data-comment="{{ comment.id }}" data-url="{{ path('app_ajax_comment_edit', {'id': comment.id}) }}">Modifier</button>
+						{% endif %}
+
+					{% endif %}
+
+					{% if is_granted("IS_AUTHENTICATED") %}
+
+						<a class="delete-pop-up btn btn-light" name="delete-pop-up" href="{{ path('app_ajax_comment_delete', {'id': comment.id}) }}" >Supprimer</a>
+					{% endif %}
+
+				</div>
+			</div>
+		{% endif %}
+	{% endif %}
+{% endfor %}

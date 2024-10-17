@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>
+			{% block title %}Accueil
+			{% endblock %}
+		</title>
+		{% block stylesheets %}{% endblock %}
+
+	</head>
+	<body class="body">
+		{% block javascripts %}
+			<div class="nav-bar">
+				<img class="logo-element" src="{{asset('files/defaults/logo-ST.png')}}" alt="logo">
+				<div class="nav-element">
+					<a class="ref-nav" href="{{path('app_default')}}">Page d'accueil</a>
+					|
+					<a class="ref-nav" href="{{path('app_trick_index')}}">Tricks</a>
+					|
+					{% if app.user %}
+						<a class="ref-nav" href="{{path('app_personal_index')}}">Page Perso</a>
+						|
+						<a class="ref-nav" href="{{path('app_logout')}}">Deconnexion</a>
+					{% else %}
+						<a class="ref-nav" href="{{path('app_login')}}">Connexion</a>
+						|
+						<a class="ref-nav" href="{{path('app_register')}}">Enregistrement</a>
+					{% endif %}
+				</div>
+			</div>
+			{% block importmap %}
+				{{ importmap('app') }}
+			{% endblock %}
+		{% endblock %}
+		{% block body %}{% endblock %}
+
+		<footer>
+		<p>@Copyright</p>
+		</footer>
+		<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+		<script src="./tricks.js"></script>
+	</body>
+</html>

@@ -1,0 +1,30 @@
+<div class="container">
+	<div class="row">
+		{% for trick in tricks %}
+			{% if number_tricks is not defined %}
+				{% if loop.index <= 6 %}
+					<div class="col-4 mt-3">
+						<a href="{{path("app_trick_show" , { "id" : trick.id} )}}">
+							<div class="trick-resume">
+								<img class="picture-multiple-trick" src="{{asset('files/defaults/no-picture.jpg')}}" alt="no picture">
+								<p class="title">{{trick.title}}</p>
+							</div>
+						</a>
+					</div>
+				{% endif %}
+			{% else %}
+			
+				{% if loop.index <= number_tricks %}
+					<div class="col-4 mt-3">
+						<a href="{{path("app_trick_show" , { "id" : trick.id} )}}">
+							<div class="trick-resume">
+								<img class="picture-multiple-trick" src="{{asset('files/defaults/no-picture.jpg')}}" alt="no picture">
+								<p class="title">{{trick.title}}</p>
+							</div>
+						</a>
+					</div>
+				{% endif %}
+			{% endif %}
+		{% endfor %}
+	</div>
+</div>
