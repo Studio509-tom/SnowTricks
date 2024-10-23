@@ -13,7 +13,7 @@
 					</div>
 				{% endif %}
 			{% else %}
-			
+
 				{% if loop.index <= number_tricks %}
 					<div class="col-4 mt-3">
 						<a href="{{path("app_trick_show" , { "id" : trick.id} )}}">
@@ -24,7 +24,13 @@
 						</a>
 					</div>
 				{% endif %}
+
 			{% endif %}
 		{% endfor %}
+		{% if number_tricks is defined %}
+			{% if number_tricks >= 15 %}
+				<a href="#title-section" class="link-top"><i class="fas fa-arrow-up"></i></a>
+				{% endif %}
+			{% endif %}
+		</div>
 	</div>
-</div>

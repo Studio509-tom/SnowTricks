@@ -31,6 +31,15 @@
 					{{ trick.content }}
 				</p>
 			</div>
+
+			<div class="date-parent">
+				{% if date_modify is null %}
+					<p class="date">{{date_create|date("d/m/Y")}}</p>
+				{% else %}
+					<p class="date">{{date_modify|date("d/m/Y")}}</p>
+
+				{% endif %}
+			</div>
 		</div>
 	</div>
 </div>

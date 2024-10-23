@@ -50,11 +50,11 @@ final class TrickController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_trick_show', methods: ['GET'])]
-    public function show(Trick $trick, CommentRepository $commentRepository, EntityManagerInterface $entityManager, UserRepository $userRepository): Response
+    public function show(Trick $trick, CommentRepository $commentRepository, UserRepository $userRepository): Response
     {
         $comment = new Comment();
         $comment->setTrick($trick);
-        $comments = $commentRepository->findBy(['trick' => $trick->getId()]);
+        $comments = $commentRepository->findBy(['trick' => $trick->getId()] , array('id' => 'DESC'));
         $form_comment = $this->createForm(CommentType::class, $comment, [
             "trick" => $trick,
         ]);
@@ -67,13 +67,18 @@ final class TrickController extends AbstractController
                 }
             }
         }
-
+        
+        $date_modify = $trick->getDateModify();
+        $date_create = $trick->getDateCreate();
+        
         return $this->render('trick/show.html.twig', [
             'trick' => $trick,
             'comments' => $comments,
             'users' => $arr_users,
             'form_comment' => $form_comment->createView(),
             "modify" => FALSE,
+            'date_modify' => $date_modify,
+            'date_create' => $date_create
         ]);
     }
 

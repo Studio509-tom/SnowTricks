@@ -1,33 +1,31 @@
 <?php
 
-   namespace App\Ajax;
+namespace App\Ajax;
 
-   use App\Entity\Trick;
-   use App\Form\TrickType;
-   use App\Repository\TrickRepository;
-   use Doctrine\ORM\EntityManagerInterface;
-   use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-   use Symfony\Component\Filesystem\Filesystem;
-   use Symfony\Component\HttpFoundation\Request;
-   use Symfony\Component\HttpFoundation\RequestStack;
-   use Symfony\Component\HttpFoundation\Response;
-   use Symfony\Component\HttpFoundation\JsonResponse;
-   use Symfony\Component\Routing\Attribute\Route;
-   use Symfony\Component\Security\Http\Attribute\IsGranted;
-   use Symfony\Component\String\Slugger\SluggerInterface;
-   use Symfony\Component\Form\FormErrorIterator;
+use App\Entity\Trick;
+use App\Form\TrickType;
+use App\Repository\TrickRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\Form\FormErrorIterator;
 
-   #[Route('/ajax/trick')]
-   final class TrickAjax extends AbstractController
+#[Route('/ajax/trick')]
+final class TrickAjax extends AbstractController
+{
+   function __construct(RequestStack $requestStack)
    {
-
-      function __construct(RequestStack $requestStack)
-      {
-
-         if (!$requestStack->getCurrentRequest()->isXmlHttpRequest()) {
-            throw new \TypeError("Accès refuser");
-         }
+      if (!$requestStack->getCurrentRequest()->isXmlHttpRequest()) {
+         throw new \TypeError("Accès refuser");
       }
+   }
 
    #[IsGranted('IS_AUTHENTICATED')]
    #[Route('/new', name: 'app_ajax_trick_new', methods: ['GET', 'POST'])]
@@ -43,12 +41,14 @@
       $form->handleRequest($request);
       if ($form->isSubmitted()) {
          if ($form->isValid()) {
-            
+            date_default_timezone_set('Europe/Paris');
+            $date_creation = new \DateTime(date('Y-m-d H:i:s'));
+            $trick->setDateCreate($date_creation);
+
             // Récupération des liens du formulaires
-            if(isset($request->get('trick')['links'])){
+            if (isset($request->get('trick')['links'])) {
                $links = $request->get('trick')['links'];
-            }
-            else{
+            } else {
                $links = [];
             }
             $setLink = [];
@@ -82,7 +82,7 @@
             }
 
             $trick->setLinks($setLink);
-            
+
             $entityManager->persist($trick);
             $entityManager->flush();
             if (!$image_empty) {
@@ -95,7 +95,8 @@
             // Récupération des tricks
             $tricks = $trickRepository->findAll();
             $tricks_html = $this->render('trick/tricks-partial.html.twig', [
-               "tricks" => $tricks
+               "tricks" => $tricks,
+               'date_create' => $date_creation
             ]);
 
             return new JsonResponse(['tricks_html' => $tricks_html->getContent(), "page" => "tricks"]);
@@ -126,16 +127,16 @@
       $link_referer = $request->headers->get('referer');
       $filesystem = new Filesystem();
 
+
       if ($form->isSubmitted() && $form->isValid()) {
          // Récupération des images envoyées via le formulaire (nouvelles images)
          $images = $form->get('files')->getData();
          // Récupération des fichiers existants dans l'entité Trick
          $existingFiles = $trick->getFiles();
          // Récupération des liens du formulaires
-         if(isset($request->get('trick')['links'])){
+         if (isset($request->get('trick')['links'])) {
             $links = $request->get('trick')['links'];
-         }
-         else{
+         } else {
             $links = [];
          }
 
@@ -145,23 +146,23 @@
 
          // Dossier de stockage
          $path = 'C:\Users\Tom\Documents\Sites_internet\SnowTricks\Site\SnowTricks\assets\files\tricks\\' . $trick->getId();
+         foreach ($deletedFiles as $fileToDelete) {
+            // Supprimer le fichier du tableau de fichiers existants
+            if (($key = array_search($fileToDelete, $existingFiles)) !== false) {
+               // Retirer le fichier de l'entité
+               unset($existingFiles[$key]);
 
-         // Gestion des suppressions
-         if ($deletedFiles) {
-            foreach ($deletedFiles as $fileToDelete) {
-               // Supprimer le fichier du tableau de fichiers existants
-               if (($key = array_search($fileToDelete, $existingFiles)) !== false) {
-                  // Retirer le fichier de l'entité
-                  unset($existingFiles[$key]);
-
-                  // Supprimer le fichier
-                  $fullFilePath = $path . '\\' . $fileToDelete;
-                  if ($filesystem->exists($fullFilePath)) {
-                     $filesystem->remove($fullFilePath);
-                  }
+               // Supprimer le fichier
+               $fullFilePath = $path . '\\' . $fileToDelete;
+               if ($filesystem->exists($fullFilePath)) {
+                  $filesystem->remove($fullFilePath);
                }
             }
          }
+
+         date_default_timezone_set('Europe/Paris');
+         $date_modify = new \DateTime(date('Y-m-d H:i:s'));
+         $trick->setDateModify($date_modify);
 
          // Gestion des ajouts de nouvelles images
          if ($images) {
@@ -221,12 +222,14 @@
          if ($link_referer == "https://127.0.0.1:8000/trick") {
             $tricks = $trickRepository->findAll();
             $tricks_html = $this->render('trick/tricks-partial.html.twig', [
-               "tricks" => $tricks
+               "tricks" => $tricks,
+               'date_modify' => $date_modify
             ]);
             return new JsonResponse(['tricks_html' => $tricks_html->getContent(), 'page' => 'tricks']);
          } else {
             $trick_html = $this->render('trick/show-partial.html.twig', [
-               "trick" => $trick
+               "trick" => $trick,
+               'date_modify' => $date_modify
             ]);
             return new JsonResponse(['tricks_html' => $trick_html->getContent(), 'page' => 'trick']);
          }
@@ -234,6 +237,7 @@
       $edit_html = $this->render('trick/edit-ajax.html.twig', [
          'trick' => $trick,
          'form' => $form,
+
       ]);
 
       return new JsonResponse(['edit_html' => $edit_html->getContent()]);
@@ -266,6 +270,4 @@
 
       return new JsonResponse(['confirm_delete' => $delete_confirm_html->getContent()]);
    }
-
-  
 }

@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\TrickRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Validator\Constraints\Json;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -37,6 +38,12 @@ class Trick
      */
     #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'trick')]
     private Collection $comments;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $date_create = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $date_modify = null;
 
     public function __construct()
     {
@@ -134,6 +141,30 @@ class Trick
                 $comment->setTrick(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getDateCreate(): ?\DateTimeInterface
+    {
+        return $this->date_create;
+    }
+
+    public function setDateCreate(\DateTimeInterface $date_create): static
+    {
+        $this->date_create = $date_create;
+
+        return $this;
+    }
+
+    public function getDateModify(): ?\DateTimeInterface
+    {
+        return $this->date_modify;
+    }
+
+    public function setDateModify(?\DateTimeInterface $date_modify): static
+    {
+        $this->date_modify = $date_modify;
 
         return $this;
     }

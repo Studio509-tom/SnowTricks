@@ -49,7 +49,7 @@ final class CommentAjax extends AbstractController
 
             $entityManager->persist($comment);
             $entityManager->flush();
-            $comments = $commentRepository->findBy(['trick' => $trick->getId()]);
+            $comments = $commentRepository->findBy(['trick' => $trick->getId()] , array('id' => 'DESC'));
 
             $users = $userRepository->findAll();
             $arr_users = [];
@@ -91,7 +91,7 @@ final class CommentAjax extends AbstractController
         $arr_users = [];
         $trick = $comment->getTrick();
         // Récupérer l'entité Trick correspondante 
-        $comments = $commentRepository->findBy(['trick' => $trick->getId()]);
+        $comments = $commentRepository->findBy(['trick' => $trick->getId()] , array('id' => 'DESC'));
         foreach ($comments as $com) {
             foreach ($users as $user) {
                 if ($user->getId() == $com->getUser()->getId()) {
@@ -146,7 +146,7 @@ final class CommentAjax extends AbstractController
             $entityManager->remove($comment);
             $entityManager->flush();
             $trick = $comment->getTrick();
-            $comments = $commentRepository->findby(['trick' => $trick->getId()]);
+            $comments = $commentRepository->findBy(['trick' => $trick->getId()] , array('id' => 'DESC'));
             $users = $userRepository->findAll();
             $arr_users = [];
             foreach ($comments as $com) {

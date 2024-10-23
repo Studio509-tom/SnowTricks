@@ -34,10 +34,10 @@ final class ShowMoreAjax extends AbstractController
     public function showMore(Request $request, TrickRepository $trickRepository): JsonResponse
     {
         // Récupération du POST
-        $number_length = $request->request->get('trick_count');
+        $number_length = (int) $request->request->get('trick_count');
 
-        if ((int) $number_length >= 6) {
-            $number_length = (int) $number_length + 6;
+        if ($number_length >= 6) {
+            $number_length = $number_length + 6;
             $tricks = $trickRepository->findBy(
                 [],
                 null,
@@ -47,12 +47,12 @@ final class ShowMoreAjax extends AbstractController
             $tricks = $trickRepository->findBy(
                 [],
                 null,
-                (int) $number_length
+                 $number_length
             );
         }
         $html_tricks = $this->render('default/tricks-show-more.html.twig', [
             "tricks" => $tricks,
-            "number_tricks" => (int) $number_length
+            "number_tricks" => $number_length
         ]);
 
         return new JsonResponse(['html_tricks' => $html_tricks->getContent()]);

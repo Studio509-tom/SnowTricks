@@ -1,13 +1,12 @@
-<div class="show-more-comments">
-{% include "trick/comments-partial.html.twig" %}
-</div>
-<div class="button-show-all">
-	<a class="btn btn-light btn-show-more-comments" href="{{path('app_ajax_comment_show_more')}}">Afficher plus</a>
-</div>
-
 {% if is_granted("IS_AUTHENTICATED") %}
 	{{ form_start(form_comment , { 'attr' : { 'class': 'form-comment' } }) }}
 	{{ form_widget(form_comment) }}
 	<button type="submit" class="submit-comment btn btn-light" name="send-comment" value="Envoyer" data-url="{{ path('app_ajax_comment_new')}}">Commenter</button>
 	{{ form_end(form_comment) }}
 {% endif %}
+<div class="show-more-comments">
+	{% include "trick/comments-partial.html.twig" %}
+</div>
+<div class="button-show-all">
+	<a class="btn btn-light btn-show-more-comments" href="{{path('app_ajax_comment_show_more')}}">Afficher plus</a>
+</div>

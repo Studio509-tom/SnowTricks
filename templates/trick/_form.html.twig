@@ -14,6 +14,8 @@
 				<div class="img-wrap">
 					<span class="close-file">&times;</span>
 					<img class="file-upload" src="{{asset('files/tricks/' ~ trick.id ~ '/' ~ file )}}" alt="Image de trick" data-filename="{{ file }}">
+					<label for="first-file">Définir comme première image</label>
+					<input type="radio" name="first-file" class="radio-file">
 				</div>
 			{% endfor %}
 		{% endif %}
