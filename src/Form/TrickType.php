@@ -41,7 +41,11 @@ class TrickType extends AbstractType
                     'class' => 'btn btn-light',
                 ],
             ])
-
+            ->add('primary_image', HiddenType::class, [
+                'mapped' => false, 
+                'required' => false,
+               
+            ])
             ->add('links', CollectionType::class, [
                 'entry_type' => UrlType::class,
                 'allow_add' => true,
@@ -57,6 +61,7 @@ class TrickType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Trick::class,
+            'allow_extra_fields' => true,
         ]);
     }
 }

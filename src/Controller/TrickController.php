@@ -45,6 +45,7 @@ final class TrickController extends AbstractController
         return $this->render('trick/new.html.twig', [
             'trick' => $trick,
             'form' => $form,
+            
 
         ]);
     }
@@ -70,7 +71,7 @@ final class TrickController extends AbstractController
         
         $date_modify = $trick->getDateModify();
         $date_create = $trick->getDateCreate();
-        
+        $first_file = $trick->getFirstFile();
         return $this->render('trick/show.html.twig', [
             'trick' => $trick,
             'comments' => $comments,
@@ -78,7 +79,9 @@ final class TrickController extends AbstractController
             'form_comment' => $form_comment->createView(),
             "modify" => FALSE,
             'date_modify' => $date_modify,
-            'date_create' => $date_create
+            'date_create' => $date_create,
+            'first_file_defined' => is_null($trick->getFirstFile()) ? true : false,
+            'first_file' => $first_file[0]
         ]);
     }
 

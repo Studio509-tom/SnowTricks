@@ -44,30 +44,43 @@ $(document).on('click' , '.edit-trick' , function(e){
     });
 
 })
-
+$(document).on('change', '.radio-file', function() {
+    // Quand un bouton radio est sélectionné
+    let selectedImage = $(this).closest('.preview').find('img').attr('src'); // Récupérer la source de l'image
+    $('#primary-image').val(selectedImage); // Mettre à jour le champ caché avec la source de l'image
+});
 // confirmation de la modification 
 $(document).on('submit', 'form[name="trick"]', function(e) {
     e.preventDefault();
-    // Récupération de l'URL
-    var url = $(this).data('url-ajax');
-    // Création de l'objet FormData pour récupérer toutes les données du formulaire, y compris les fichiers
-    var formData = new FormData();
 
-    // ! Impossible de récupéré l'image qui est checked
-    // let check_box = $('.radio-file:checked');
-    // let parent_checkedBox = $(check_box).parent();
-    // var reader = new FileReader();
-    // console.log(reader.readAsDataURL($('#trick_files').val())); 
-    // console.log($('#trick_files').val()); 
-    // $('.file-select').each(function() {
-    //     if($('.file-select').parent()[0] == parent_checkedBox[0] ){
-    //         console.log($(this)[0].src);
-    //     }
-    // });
-   
-    // console.log($(parent_checkedBox).children('img'));
-    // let img = $(parent_checkedBox);
-    
+    var url = $(this).data('url-ajax');
+    var formData = new FormData();
+    let checkedBox = $('.radio-file:checked');
+    if (checkedBox.length > 0) {
+        let selectedImage = checkedBox.closest('.preview').find('img').attr('src'); // Récupérer la source de l'image sélectionnée
+        console.log(selectedImage);
+
+        // Si l'image est en base64, on la convertit en Blob
+        if (selectedImage.startsWith('data:image')) {
+            // Extraire le type d'image
+            let mimeType = selectedImage.split(',')[0].split(':')[1].split(';')[0];
+            let base64Data = selectedImage.split(',')[1];
+
+            // Convertir le base64 en un tableau binaire
+            let byteCharacters = atob(base64Data);
+            let byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            let byteArray = new Uint8Array(byteNumbers);
+
+            // Créer un Blob à partir du tableau binaire
+            let blob = new Blob([byteArray], { type: mimeType });
+            // Ajouter l'image sélectionnée comme fichier dans FormData
+            formData.append('primary_image', blob, 'primary_image.jpg');
+        }
+    }
+
     // Ajouter manuellement les autres champs du formulaire
     $(this).find('input, textarea, select').not('input[type="file"]').each(function() {
         if ($(this).attr('name') !== "trick[links]") {
@@ -85,8 +98,8 @@ $(document).on('submit', 'form[name="trick"]', function(e) {
             formData.append('trick[links][]', links[i]);
         }
     };
-    
-    // Ajouter manuellement les fichiers sélectionnés dans FormData
+
+    // Ajouter les fichiers sélectionnés dans FormData
     for (let i = 0; i < selectedFiles.length; i++) {
         formData.append('trick[files][]', selectedFiles[i]);
     }
@@ -96,10 +109,61 @@ $(document).on('submit', 'form[name="trick"]', function(e) {
         existingFiles.push($(this).data('filename'));
     });
 
-
-    // Ajouter les fichiers existants au formData 
     formData.append('existing_files', JSON.stringify(existingFiles));
     formData.append('deleted_files', JSON.stringify(deletedFiles));
+    // e.preventDefault();
+    // // Récupération de l'URL
+    // var url = $(this).data('url-ajax');
+    // // Création de l'objet FormData pour récupérer toutes les données du formulaire, y compris les fichiers
+    // var formData = new FormData();
+
+    // // ! Impossible de récupéré l'image qui est checked
+    // // let check_box = $('.radio-file:checked');
+    // // let parent_checkedBox = $(check_box).parent();
+    // // var reader = new FileReader();
+    // // console.log(reader.readAsDataURL($('#trick_files').val())); 
+    // // console.log($('#trick_files').val()); 
+    // // $('.file-select').each(function() {
+    // //     if($('.file-select').parent()[0] == parent_checkedBox[0] ){
+    // //         console.log($(this)[0].src);
+    // //     }
+    // // });
+   
+    // // console.log($(parent_checkedBox).children('img'));
+    // // let img = $(parent_checkedBox);
+    
+    // // Ajouter manuellement les autres champs du formulaire
+    // $(this).find('input, textarea, select').not('input[type="file"]').each(function() {
+    //     if ($(this).attr('name') !== "trick[links]") {
+    //         formData.append($(this).attr('name'), $(this).val());
+    //     }
+    // });
+
+    // var links = [];
+    // $('.parent-links input').each(function() {
+    //     links.push($(this).val());
+    // });
+
+    // for (let i = 0; i < links.length; i++) {
+    //     if (links[i] !== "" && links[i] !== null ) {
+    //         formData.append('trick[links][]', links[i]);
+    //     }
+    // };
+    
+    // // Ajouter manuellement les fichiers sélectionnés dans FormData
+    // for (let i = 0; i < selectedFiles.length; i++) {
+    //     formData.append('trick[files][]', selectedFiles[i]);
+    // }
+
+    // var existingFiles = [];
+    // $('#image-preview-existing img').each(function() {
+    //     existingFiles.push($(this).data('filename'));
+    // });
+
+
+    // // Ajouter les fichiers existants au formData 
+    // formData.append('existing_files', JSON.stringify(existingFiles));
+    // formData.append('deleted_files', JSON.stringify(deletedFiles));
     
     $.ajax({
         method: "POST",

@@ -37,14 +37,22 @@ final class TrickAjax extends AbstractController
       $trick->setUser($this->getUser());
 
       $form = $this->createForm(TrickType::class, $trick);
-
+      $hash_first_file = null;
       $form->handleRequest($request);
       if ($form->isSubmitted()) {
          if ($form->isValid()) {
+            $primaryImage = $request->files->get('primary_image');
+            if ($primaryImage) {
+               // pour traiter l'image principale 
+               $newFilename = uniqid() . '.' . $primaryImage->guessExtension();
+               $imageContent = file_get_contents($primaryImage->getPathname());
+               // Hashage pour supprimer le doublon lors de l'enregistrement plus bas
+               $hash_first_file = hash('sha256', $imageContent);
+               $trick->setFirstFile([$newFilename]);
+            }
             date_default_timezone_set('Europe/Paris');
             $date_creation = new \DateTime(date('Y-m-d H:i:s'));
             $trick->setDateCreate($date_creation);
-
             // Récupération des liens du formulaires
             if (isset($request->get('trick')['links'])) {
                $links = $request->get('trick')['links'];
@@ -64,11 +72,14 @@ final class TrickAjax extends AbstractController
                   $safeFilename = $slugger->slug($originalFilename);
                   $newFilename = $safeFilename . '-' . uniqid() . '.' . $image->guessExtension();
 
-                  $files_entity[] = $newFilename;
-                  $trick->setFiles($files_entity);
+                  $imageContent = file_get_contents($image->getPathname());
+                  $hash_file = hash('sha256', $imageContent);
+                  if ($hash_file != $hash_first_file) {
+                     $files_entity[] = $newFilename;
+                     $trick->setFiles($files_entity);
+                  }
                }
             }
-
             // Boucler sur les lien récupéré du formulaire
             foreach ($links as $link) {
                // Si pas vide
@@ -85,12 +96,20 @@ final class TrickAjax extends AbstractController
 
             $entityManager->persist($trick);
             $entityManager->flush();
+            $path = 'C:\Users\Tom\Documents\Sites_internet\SnowTricks\Site\assets\files\tricks\\' . $trick->getId();
             if (!$image_empty) {
-               $path = 'C:\Users\Tom\Documents\Sites_internet\SnowTricks\Site\SnowTricks\assets\files\tricks\\' . $trick->getId();
-               for ($i = 0; $i < count($images); $i++) {
+               for ($i = 0; $i < count($files_entity); $i++) {
                   $file =  $files_entity[$i];
                   $images[$i]->move($path, $file);
                }
+            }
+            if ($primaryImage) {
+               $first_file = $trick->getFirstFile();
+              
+               $primaryImage->move(
+                  $path,
+                  $first_file[0]
+               );
             }
             // Récupération des tricks
             $tricks = $trickRepository->findAll();
@@ -129,7 +148,7 @@ final class TrickAjax extends AbstractController
 
 
       if ($form->isSubmitted() && $form->isValid()) {
-         // Récupération des images envoyées via le formulaire (nouvelles images)
+         // Récupération des images envoyées via le formulaire 
          $images = $form->get('files')->getData();
          // Récupération des fichiers existants dans l'entité Trick
          $existingFiles = $trick->getFiles();
@@ -145,7 +164,7 @@ final class TrickAjax extends AbstractController
          $deletedFiles = json_decode($request->get('deleted_files', [])); // Tableau des fichiers à supprimer
 
          // Dossier de stockage
-         $path = 'C:\Users\Tom\Documents\Sites_internet\SnowTricks\Site\SnowTricks\assets\files\tricks\\' . $trick->getId();
+         $path = 'C:\Users\Tom\Documents\Sites_internet\SnowTricks\Site\assets\files\tricks\\' . $trick->getId();
          foreach ($deletedFiles as $fileToDelete) {
             // Supprimer le fichier du tableau de fichiers existants
             if (($key = array_search($fileToDelete, $existingFiles)) !== false) {

@@ -45,6 +45,9 @@ class Trick
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $date_modify = null;
 
+    #[ORM\Column(type: "json" , nullable: true)]
+    private ?array $first_file = null;
+
     public function __construct()
     {
         $this->comments = new ArrayCollection();
@@ -165,6 +168,18 @@ class Trick
     public function setDateModify(?\DateTimeInterface $date_modify): static
     {
         $this->date_modify = $date_modify;
+
+        return $this;
+    }
+
+    public function getFirstFile(): ?array
+    {
+        return $this->first_file;
+    }
+
+    public function setFirstFile(?array $first_file): static
+    {
+        $this->first_file = $first_file;
 
         return $this;
     }
