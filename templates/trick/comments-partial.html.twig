@@ -7,9 +7,10 @@
 					{% for user in users %}
 						{% if user.getId() == comment.getUser().getId() %}
 							{% if user.getAvatarNameFile() is null %}
-								<img class="avatar-user" src="{{asset('files/defaults/default-avatar.jpg')}}" alt="">
+								<img class="avatar-user" src="{{asset('files/defaults/default-avatar.jpg')}}" alt="image par default">
 							{% else %}
-								<img class="avatar-user" src="{{asset('files/users/' ~ user.getId() ~ '/' ~ user.getAvatarNameFile() )}}" alt="">
+								<img class="avatar-user" src="{{asset('files/users/' ~ user.getId() ~ '/' ~ user.getAvatarNameFile() )}}" alt="image avatar">
+								{# <p>{{user.name}}</p> #}
 							{% endif %}
 						{% endif %}
 					{% endfor %}
@@ -23,14 +24,18 @@
 
 						<p class="content-comment content-{{ comment.id }}">{{ comment.content }}</p>
 						{% if is_granted("IS_AUTHENTICATED") %}
-							<button class="modify-comment btn btn-light" data-comment="{{ comment.id }}" data-url="{{ path('app_ajax_comment_edit', {'id': comment.id}) }}">Modifier</button>
+							<button class="modify-comment btn btn-light" data-comment="{{ comment.id }}" data-url="{{ path('app_ajax_comment_edit', {'id': comment.id}) }}">
+								<i class="fas fa-pencil"></i>
+							</button>
 						{% endif %}
 
 					{% endif %}
 
 					{% if is_granted("IS_AUTHENTICATED") %}
 
-						<a class="delete-pop-up btn btn-light" name="delete-pop-up" href="{{ path('app_ajax_comment_delete', {'id': comment.id}) }}">Supprimer</a>
+						<a class="delete-pop-up btn btn-light" name="delete-pop-up" href="{{ path('app_ajax_comment_delete', {'id': comment.id}) }}">
+							<i class="fas fa-trash-can"></i>
+						</a>
 					{% endif %}
 
 				</div>
@@ -60,14 +65,18 @@
 
 						<p class="content-comment content-{{ comment.id }}">{{ comment.content }}</p>
 						{% if is_granted("IS_AUTHENTICATED") %}
-							<button class="modify-comment btn btn-light" data-comment="{{ comment.id }}" data-url="{{ path('app_ajax_comment_edit', {'id': comment.id}) }}">Modifier</button>
+							<button class="modify-comment btn btn-light" data-comment="{{ comment.id }}" data-url="{{ path('app_ajax_comment_edit', {'id': comment.id}) }}">
+								<i class="fas fa-pencil"></i>
+							</button>
 						{% endif %}
 
 					{% endif %}
 
 					{% if is_granted("IS_AUTHENTICATED") %}
 
-						<a class="delete-pop-up btn btn-light" name="delete-pop-up" href="{{ path('app_ajax_comment_delete', {'id': comment.id}) }}" >Supprimer</a>
+						<a class="delete-pop-up btn btn-light" name="delete-pop-up" href="{{ path('app_ajax_comment_delete', {'id': comment.id}) }}">
+							<i class="fas fa-trash-can"></i>
+						</a>
 					{% endif %}
 
 				</div>

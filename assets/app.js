@@ -18,7 +18,6 @@ $(document).on('click' , '.create-trick' , function(e){
     e.preventDefault();
     var url = $(this).attr('href');
 
-
     $.ajax({
         method: "POST",
         url: url,
@@ -49,7 +48,7 @@ $(document).on('change', '.radio-file', function() {
     let selectedImage = $(this).closest('.preview').find('img').attr('src'); // Récupérer la source de l'image
     $('#primary-image').val(selectedImage); // Mettre à jour le champ caché avec la source de l'image
 });
-// confirmation de la modification 
+// Confirmation de la modification 
 $(document).on('submit', 'form[name="trick"]', function(e) {
     e.preventDefault();
 
@@ -58,8 +57,6 @@ $(document).on('submit', 'form[name="trick"]', function(e) {
     let checkedBox = $('.radio-file:checked');
     if (checkedBox.length > 0) {
         let selectedImage = checkedBox.closest('.preview').find('img').attr('src'); // Récupérer la source de l'image sélectionnée
-        console.log(selectedImage);
-
         // Si l'image est en base64, on la convertit en Blob
         if (selectedImage.startsWith('data:image')) {
             // Extraire le type d'image
@@ -78,6 +75,9 @@ $(document).on('submit', 'form[name="trick"]', function(e) {
             let blob = new Blob([byteArray], { type: mimeType });
             // Ajouter l'image sélectionnée comme fichier dans FormData
             formData.append('primary_image', blob, 'primary_image.jpg');
+        }else{
+            let file_name = checkedBox.closest('.preview').find('img').data('filename');
+            formData.append('primary_image' , file_name)
         }
     }
 
@@ -111,60 +111,7 @@ $(document).on('submit', 'form[name="trick"]', function(e) {
 
     formData.append('existing_files', JSON.stringify(existingFiles));
     formData.append('deleted_files', JSON.stringify(deletedFiles));
-    // e.preventDefault();
-    // // Récupération de l'URL
-    // var url = $(this).data('url-ajax');
-    // // Création de l'objet FormData pour récupérer toutes les données du formulaire, y compris les fichiers
-    // var formData = new FormData();
-
-    // // ! Impossible de récupéré l'image qui est checked
-    // // let check_box = $('.radio-file:checked');
-    // // let parent_checkedBox = $(check_box).parent();
-    // // var reader = new FileReader();
-    // // console.log(reader.readAsDataURL($('#trick_files').val())); 
-    // // console.log($('#trick_files').val()); 
-    // // $('.file-select').each(function() {
-    // //     if($('.file-select').parent()[0] == parent_checkedBox[0] ){
-    // //         console.log($(this)[0].src);
-    // //     }
-    // // });
    
-    // // console.log($(parent_checkedBox).children('img'));
-    // // let img = $(parent_checkedBox);
-    
-    // // Ajouter manuellement les autres champs du formulaire
-    // $(this).find('input, textarea, select').not('input[type="file"]').each(function() {
-    //     if ($(this).attr('name') !== "trick[links]") {
-    //         formData.append($(this).attr('name'), $(this).val());
-    //     }
-    // });
-
-    // var links = [];
-    // $('.parent-links input').each(function() {
-    //     links.push($(this).val());
-    // });
-
-    // for (let i = 0; i < links.length; i++) {
-    //     if (links[i] !== "" && links[i] !== null ) {
-    //         formData.append('trick[links][]', links[i]);
-    //     }
-    // };
-    
-    // // Ajouter manuellement les fichiers sélectionnés dans FormData
-    // for (let i = 0; i < selectedFiles.length; i++) {
-    //     formData.append('trick[files][]', selectedFiles[i]);
-    // }
-
-    // var existingFiles = [];
-    // $('#image-preview-existing img').each(function() {
-    //     existingFiles.push($(this).data('filename'));
-    // });
-
-
-    // // Ajouter les fichiers existants au formData 
-    // formData.append('existing_files', JSON.stringify(existingFiles));
-    // formData.append('deleted_files', JSON.stringify(deletedFiles));
-    
     $.ajax({
         method: "POST",
         url: url,
@@ -181,6 +128,8 @@ $(document).on('submit', 'form[name="trick"]', function(e) {
             } else if (data.page === "trick") {
                 // Mise à jour du contenu du trick spécifique
                 $('.content-show-trick').html(data.tricks_html);
+            } else if(data.page === "home"){
+            $('.show-more-tricks').html(data.tricks_html);
             }
         },
         error: function(xhr) {
@@ -312,8 +261,8 @@ $(document).on('change' , '#trick_files' , function(event){
      selectedFiles.push(files[i]);
     }
     var preview = $('#image-preview');
-    var div_preview = $('<div class="preview"></div>')
-    console.log(files)
+    var div_preview = $('<div class="preview"></div>');
+
     for (let i = 0; i < files.length; i++) {
         var file = files[i];
         var reader = new FileReader();
@@ -328,7 +277,6 @@ $(document).on('change' , '#trick_files' , function(event){
             $(div_preview).append(img);
             $(div_preview).append('<label for="first-file">Définir comme première image</label><input type="radio" name="first-file" class="radio-file">')
         }
-        console.log(file);
         // Convertir le fichier en base64
         reader.readAsDataURL(file); 
     }
@@ -339,7 +287,7 @@ $(document).on('click' , '.close-file' , function(){
     let file_delete = parent_this.children('.file-upload').data('filename');
     let img_element = parent_this.children('img');
     deletedFiles.push(file_delete);
-    img_element.remove()
+    parent_this.remove()
 })
 
 $(document).on('click' , '.add-links' , function(e){

@@ -9,8 +9,14 @@
 						<img class="picture-multiple-trick" src="{{asset('files/defaults/no-picture.jpg')}}" alt="no picture">
 						<p class="title">{{trick.title}}</p>
 						{% if is_granted("IS_AUTHENTICATED") %}
-							<a class="btn btn-light edit-trick" href="{{ path('app_ajax_trick_edit', {'id': trick.id}) }}">Modifier</a>
-							<a class="btn btn-light delete-pop-up" href="{{ path('app_ajax_trick_delete', {'id': trick.id}) }}">Supprimer</a>
+							<div class="link-change-trick">
+								<a class="btn btn-light edit-trick" href="{{ path('app_ajax_trick_edit', {'id': trick.id}) }}">
+									<i class="fas fa-pencil"></i>
+								</a>
+								<a class="btn btn-light delete-pop-up" href="{{ path('app_ajax_trick_delete', {'id': trick.id}) }}">
+									<i class="fas fa-trash-can"></i>
+								</a>
+							</div>
 						{% endif %}
 					</div>
 

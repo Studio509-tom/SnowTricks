@@ -12,18 +12,45 @@
 	{% if trick %}
 		{% if trick.files is not empty %}
 			{% for file in trick.files %}
-				<div class="img-wrap">
-					<span class="close-file">&times;</span>
-					<img class="file-upload" src="{{asset('files/tricks/' ~ trick.id ~ '/' ~ file )}}" alt="Image de trick" data-filename="{{ file }}">
-					<label for="first-file">Définir comme première image</label>
-					<input type="radio" name="first-file" class="radio-file">
+				{% if first_file_defined is not null %}
+					<p>image mise en avant :
+					</p>
+					<div class="preview">
+						<div class="img-wrap">
+							<span class="close-file">&times;</span>
+							<img class="first-file-img" src={{asset("files/tricks/"~ trick.id ~ "/" ~ first_file) }} alt="test" data-filename="{{ first_file }}">
+							<label for="first-file">Définir comme première image</label>
+							<input type="radio" name="first-file" class="radio-file" checked>
+						</div>
+					</div>
+				{% endif %}
+				<div class="preview">
+					<div class="img-wrap">
+						<span class="close-file">&times;</span>
+						<img class="file-upload" src="{{asset('files/tricks/' ~ trick.id ~ '/' ~ file )}}" alt="Image de trick" data-filename="{{ file }}">
+						<label for="first-file">Définir comme première image</label>
+						<input type="radio" name="first-file" class="radio-file">
+					</div>
 				</div>
 			{% endfor %}
+		{% else %}
+			{% if first_file_defined is not null %}
+				<p>image mise en avant :
+				</p>
+				<div class="preview">
+					<div class="img-wrap">
+						<span class="close-file">&times;</span>
+						<img class="first-file-img" src={{asset("files/tricks/"~ trick.id ~ "/" ~ first_file) }} alt="test" data-filename="{{ first_file }}">
+						<label for="first-file">Définir comme première image</label>
+						<input type="radio" name="first-file" class="radio-file" checked>
+					</div>
+				</div>
+			{% endif %}
 		{% endif %}
 	{% endif %}
 </div>
 
 <div id="image-preview"></div>
-<input id="submit-form-trick" type="submit" name="save" class="btn" value="{{ button_label|default('Save')}}">
+<input id="submit-form-trick" type="submit" name="save" class="btn" value="{{ button_label|default('Enregistrer')}}">
 {{ form_rest(form) }}
 {{ form_end(form) }}
