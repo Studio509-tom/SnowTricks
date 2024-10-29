@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Erreur
+{% endblock %}
+
+{% block body %}
+	<main id="main">
+
+		<section class="single-post-content">
+			<div class="container">
+				<div class="row">
+					<div class="col mt-4 alert-danger py-5 px-3 text-center">
+						{% if app.request.attributes.get('exception').getStatusCode == '404' %}
+							<h1 class="display-2 fw-bold">ERREUR 404</h1>
+							<h5>La page que vous recherchez n'existe pas... ou plus !</h5>
+						{% elseif app.request.attributes.get('exception').getStatusCode == '403' %}
+							<h1 class="display-2 fw-bold">ERREUR 403</h1>
+							<h5>Vous ne pouvez pas afficher cette page ou cette section !</h5>
+						{% elseif app.request.attributes.get('exception').getStatusCode == '500' %}
+							<h1 class="display-2 fw-bold">ERREUR 500</h1>
+							<h5>Oups !?! Un problème est survenu lors de l'affichage de cette page, merci de réessayer ultérieurement !</h5>
+						{% else %}
+							<h5>Oups !?! Un problème est survenu lors de l'affichage de cette page, merci de réessayer ultérieurement !</h5>
+						{% endif %}
+					</div>
+
+					<div class="mt-3 text-center">
+						<a class="btn btn-primary p-3 lead" href="{{ path('app_default') }}">Page d'accueil</a>
+					</div>
+				</div>
+			</div>
+		</section>
+
+	</main>
+{% endblock %}

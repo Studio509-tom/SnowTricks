@@ -81,7 +81,8 @@ final class TrickController extends AbstractController
             'date_modify' => $date_modify,
             'date_create' => $date_create,
             'first_file_defined' => is_null($trick->getFirstFile()) ? true : false,
-            'first_file' => $first_file[0]
+            'first_file' => is_null($first_file) || empty($first_file) ? null : $first_file[0],
+
         ]);
     }
 

@@ -41,6 +41,20 @@ final class TrickAjax extends AbstractController
       $form->handleRequest($request);
       if ($form->isSubmitted()) {
          if ($form->isValid()) {
+            // Vérification que le nom n'est pas déjà enregistrer
+            $title_trick = $trick->getTitle();
+            $occurence_title = $trickRepository->findByTitle($title_trick);
+            if (!empty($occurence_title)) {
+               $this->addFlash('error', 'Le titre de cette article est déjà utilisé.');
+               $create_html = $this->render('trick/new.html.twig', [
+                  'trick' => $trick,
+                  'form' => $form,
+                  'first_file_defined' => null,
+                  'error' => true
+               ]);
+         
+               return new JsonResponse(['edit_html' => $create_html->getContent() , 'error' => true]);
+            }
             $primaryImage = $request->files->get('primary_image');
             if ($primaryImage) {
                // pour traiter l'image principale 
@@ -93,8 +107,8 @@ final class TrickAjax extends AbstractController
                   }
                }
             }
-
             $trick->setLinks($setLink);
+
 
             $entityManager->persist($trick);
             $entityManager->flush();
@@ -113,11 +127,13 @@ final class TrickAjax extends AbstractController
                   $first_file[0]
                );
             }
+            $this->addFlash('success', 'Article correctement crée');
             // Récupération des tricks
             $tricks = $trickRepository->findAll();
             $tricks_html = $this->render('trick/tricks-partial.html.twig', [
                "tricks" => $tricks,
                'date_create' => $date_creation
+
             ]);
 
             return new JsonResponse(['tricks_html' => $tricks_html->getContent(), "page" => "tricks"]);
@@ -142,7 +158,7 @@ final class TrickAjax extends AbstractController
    }
 
 
-   #[IsGranted('IS_AUTHENTICATED')]
+   #[IsGranted('ROLE_USER')]
    #[Route('/{id}/edit', name: 'app_ajax_trick_edit', methods: ['GET', 'POST'])]
    public function edit(Request $request, Trick $trick, EntityManagerInterface $entityManager, TrickRepository $trickRepository, SluggerInterface $slugger): Response
    {
@@ -154,6 +170,30 @@ final class TrickAjax extends AbstractController
       $existingFiles = $trick->getFiles();
 
       if ($form->isSubmitted() && $form->isValid()) {
+         // Vérification que le nom n'est pas déjà enregistrer
+         $title_trick = $trick->getTitle();
+         $occurence_title = $trickRepository->findByTitle($title_trick);
+         $enter = false;
+         foreach ($occurence_title as $occurence) {
+            if ($trick->getId() == $occurence->getId()) {
+               $enter = true;
+            }
+         }
+         // Si l'occurence trouvé n'est pas vide et que ils n'ont pas le même id
+         if (!empty($occurence_title) && !$enter) {
+            $this->addFlash('error', 'Le titre de cette article est déjà utilisé.');
+            $first_file = $trick->getFirstFile();
+
+            $edit_html = $this->render('trick/edit-ajax.html.twig', [
+               'trick' => $trick,
+               'form' => $form,
+               'first_file_defined' => is_null($first_file) || empty($first_file) ? null : true,
+               'first_file' => is_null($first_file) || empty($first_file) ? null : $first_file[0],
+            ]);
+
+            return new JsonResponse(['edit_html' => $edit_html->getContent(), 'error' => true]);
+         }
+
          $path = 'C:\Users\Tom\Documents\Sites_internet\SnowTricks\Site\assets\files\tricks\\' . $trick->getId();
          $primaryImage = $request->files->get('primary_image');
          // Si l'images n'est pas envoyer sous format images mais text (qu'elle est déjà enregistré)
@@ -163,10 +203,14 @@ final class TrickAjax extends AbstractController
             if ($filesystem->exists($path . '\\' . $primaryImage)) {
                $first_file_arr = $trick->getFirstFile();
                // Si ce n'est pas l'image déjà mis en avant
-               if ($primaryImage !== $first_file_arr[0]) {
-                  unset($existingFiles[array_search($primaryImage, $existingFiles)]);
-                  $existingFiles[] = $first_file_arr[0];
-                  $trick->setFirstFile([$primaryImage]);
+               if (!is_null($primaryImage)) {
+                  if ($primaryImage !== $first_file_arr[0]) {
+                     unset($existingFiles[array_search($primaryImage, $existingFiles)]);
+                     $existingFiles[] = $first_file_arr[0];
+                     $trick->setFirstFile([$primaryImage]);
+                  }
+               } else {
+                  $trick->setFirstFile(NULL);
                }
             }
          } else {
@@ -270,32 +314,35 @@ final class TrickAjax extends AbstractController
 
          $entityManager->flush();
          $first_file = $trick->getFirstFile();
+         // Si on est sur la page des tricks
          if ($link_referer == "https://127.0.0.1:8000/trick") {
             $tricks = $trickRepository->findAll();
             $tricks_html = $this->render('trick/tricks-partial.html.twig', [
                "tricks" => $tricks,
                'date_modify' => $date_modify,
-               'first_file_defined' => is_null($first_file) ? null : true,
-               'first_file' => $first_file[0]
+               'first_file_defined' => is_null($first_file) || empty($first_file) ? null : true,
+               'first_file' => is_null($first_file) || empty($first_file) ? null : $first_file[0],
             ]);
             return new JsonResponse(['tricks_html' => $tricks_html->getContent(), 'page' => 'tricks']);
-         } else if($link_referer == "https://127.0.0.1:8000/"){
+            // Si on est sur la page d'accueil
+         } else if ($link_referer == "https://127.0.0.1:8000/") {
             $tricks = $trickRepository->findAll();
             $tricks_html = $this->render('default/tricks-show-more.html.twig', [
                "tricks" => $tricks,
                'date_modify' => $date_modify,
-               'first_file_defined' => is_null($first_file) ? null : true,
-               'first_file' => $first_file[0],
+               'first_file_defined' => is_null($first_file) || empty($first_file) ? null : true,
+               'first_file' => is_null($first_file) || empty($first_file) ? null : $first_file[0],
                "number_tricks" => 6,
             ]);
             return new JsonResponse(['tricks_html' => $tricks_html->getContent(), 'page' => 'home']);
          }
+         // Sui on est sur la page d'un trick
          else {
             $trick_html = $this->render('trick/show-partial.html.twig', [
                "trick" => $trick,
                'date_modify' => $date_modify,
-               'first_file_defined' => is_null($first_file) ? null : true,
-               'first_file' => $first_file[0]
+               'first_file_defined' => is_null($first_file) || empty($first_file) ? null : true,
+               'first_file' => is_null($first_file) || empty($first_file) ? null : $first_file[0],
             ]);
             return new JsonResponse(['tricks_html' => $trick_html->getContent(), 'page' => 'trick']);
          }
@@ -305,14 +352,14 @@ final class TrickAjax extends AbstractController
       $edit_html = $this->render('trick/edit-ajax.html.twig', [
          'trick' => $trick,
          'form' => $form,
-         'first_file_defined' => is_null($first_file) ? null : true,
-         'first_file' => $first_file[0]
+         'first_file_defined' => is_null($first_file) || empty($first_file) ? null : true,
+         'first_file' => is_null($first_file) || empty($first_file) ? null : $first_file[0],
       ]);
 
       return new JsonResponse(['edit_html' => $edit_html->getContent()]);
    }
 
-   #[IsGranted('IS_AUTHENTICATED')]
+   #[IsGranted('ROLE_USER')]
    #[Route('/{id}', name: 'app_ajax_trick_delete', methods: ['POST'])]
    public function delete(Request $request, Trick $trick, EntityManagerInterface $entityManager, TrickRepository $trickRepository): Response
    {

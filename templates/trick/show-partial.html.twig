@@ -39,9 +39,11 @@
 
 			<div class="date-parent">
 				{% if date_modify is null %}
-					<p class="date">Crée le : {{date_create|date("d/m/Y")}}</p>
+					<p class="date">Crée le :
+						{{date_create|date("d/m/Y")}}</p>
 				{% else %}
-					<p class="date">Modifier le : {{date_modify|date("d/m/Y")}}</p>
+					<p class="date">Modifier le :
+						{{date_modify|date("d/m/Y")}}</p>
 
 				{% endif %}
 			</div>
@@ -49,8 +51,11 @@
 	</div>
 </div>
 <a class="btn btn-light" href="{{ path('app_trick_index') }}">Retour à la liste</a>
-{% if is_granted("IS_AUTHENTICATED") %}
-
-	<a class="btn btn-light edit-trick" href="{{ path('app_ajax_trick_edit', {'id': trick.id}) }}"><i class="fas fa-pencil"></i></a>
-	<a class="btn btn-light delete-pop-up" href="{{ path('app_ajax_trick_delete', {'id': trick.id}) }}"><i class="fas fa-trash-can"></i></a>
-</div>{% endif %}
+{% if is_granted("ROLE_ADMIN") or trick.getUser().getId() == app.user.id %}
+	<a class="btn btn-light edit-trick" href="{{ path('app_ajax_trick_edit', {'id': trick.id}) }}">
+		<i class="fas fa-pencil"></i>
+	</a>
+	<a class="btn btn-light delete-pop-up" href="{{ path('app_ajax_trick_delete', {'id': trick.id}) }}">
+		<i class="fas fa-trash-can"></i>
+	</a>
+{% endif %}

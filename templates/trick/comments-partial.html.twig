@@ -7,9 +7,19 @@
 					{% for user in users %}
 						{% if user.getId() == comment.getUser().getId() %}
 							{% if user.getAvatarNameFile() is null %}
-								<img class="avatar-user" src="{{asset('files/defaults/default-avatar.jpg')}}" alt="image par default">
+								<div class="user-info-comment">
+									<img class="avatar-user" src="{{asset('files/defaults/default-avatar.jpg')}}" alt="image par default">
+									<div class="name-user">
+										<p>{{user.getLastname()}}</p>
+										<p>{{user.getFirstname()}}</p>
+									</div>
+								</div>
 							{% else %}
-								<img class="avatar-user" src="{{asset('files/users/' ~ user.getId() ~ '/' ~ user.getAvatarNameFile() )}}" alt="image avatar">
+								<div class="user-info-comment mx-2	">
+									<img class="avatar-user" src="{{asset('files/users/' ~ user.getId() ~ '/' ~ user.getAvatarNameFile() )}}" alt="image avatar">
+									<p>{{user.getLastname()}}
+										{{user.getFirstname()}}</p>
+								</div>
 								{# <p>{{user.name}}</p> #}
 							{% endif %}
 						{% endif %}
@@ -23,7 +33,7 @@
 					{% else %}
 
 						<p class="content-comment content-{{ comment.id }}">{{ comment.content }}</p>
-						{% if is_granted("IS_AUTHENTICATED") %}
+						{% if is_granted("ROLE_ADMIN") or comment.getUser().getId() == app.user.id %}
 							<button class="modify-comment btn btn-light" data-comment="{{ comment.id }}" data-url="{{ path('app_ajax_comment_edit', {'id': comment.id}) }}">
 								<i class="fas fa-pencil"></i>
 							</button>
@@ -31,7 +41,8 @@
 
 					{% endif %}
 
-					{% if is_granted("IS_AUTHENTICATED") %}
+					{% if is_granted("ROLE_ADMIN") or comment.getUser().getId() == app.user.id %}
+
 
 						<a class="delete-pop-up btn btn-light" name="delete-pop-up" href="{{ path('app_ajax_comment_delete', {'id': comment.id}) }}">
 							<i class="fas fa-trash-can"></i>
@@ -64,7 +75,8 @@
 					{% else %}
 
 						<p class="content-comment content-{{ comment.id }}">{{ comment.content }}</p>
-						{% if is_granted("IS_AUTHENTICATED") %}
+						{% if is_granted("ROLE_ADMIN") or comment.getUser().getId() == app.user.id %}
+
 							<button class="modify-comment btn btn-light" data-comment="{{ comment.id }}" data-url="{{ path('app_ajax_comment_edit', {'id': comment.id}) }}">
 								<i class="fas fa-pencil"></i>
 							</button>
@@ -72,7 +84,8 @@
 
 					{% endif %}
 
-					{% if is_granted("IS_AUTHENTICATED") %}
+					{% if is_granted("ROLE_ADMIN") or comment.getUser().getId() == app.user.id %}
+
 
 						<a class="delete-pop-up btn btn-light" name="delete-pop-up" href="{{ path('app_ajax_comment_delete', {'id': comment.id}) }}">
 							<i class="fas fa-trash-can"></i>

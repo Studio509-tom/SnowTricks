@@ -22,6 +22,7 @@ $(document).on('click' , '.create-trick' , function(e){
         method: "POST",
         url: url,
         success: function(reponse){
+            console.log(reponse)
             $('<div id="dialog"></div>').html(reponse.create_html).dialog();
             $('form[name="trick"]').data('url-ajax', url);
         }
@@ -78,7 +79,7 @@ $(document).on('submit', 'form[name="trick"]', function(e) {
         }else{
             let file_name = checkedBox.closest('.preview').find('img').data('filename');
             formData.append('primary_image' , file_name)
-        }
+        }   
     }
 
     // Ajouter manuellement les autres champs du formulaire
@@ -120,16 +121,22 @@ $(document).on('submit', 'form[name="trick"]', function(e) {
         contentType: false,  
         success: function(data) {
             selectedFiles = [];     
-            $( "#dialog" ).dialog("close");
+            $( "#dialog" ).dialog("destroy");
 
-            if (data.page === "tricks") {
-                // Mise à jour de la liste des tricks
-                $('.tricks').html(data.tricks_html);
-            } else if (data.page === "trick") {
-                // Mise à jour du contenu du trick spécifique
-                $('.content-show-trick').html(data.tricks_html);
-            } else if(data.page === "home"){
-            $('.show-more-tricks').html(data.tricks_html);
+            if(data.error){
+                $('<div id="dialog"></div>').html(data.edit_html).dialog();
+                $('form[name="trick"]').data('url-ajax', url);
+            }
+            else{
+                if (data.page === "tricks") {
+                    // Mise à jour de la liste des tricks
+                    $('.tricks').html(data.tricks_html);
+                } else if (data.page === "trick") {
+                    // Mise à jour du contenu du trick spécifique
+                    $('.content-show-trick').html(data.tricks_html);
+                } else if(data.page === "home"){
+                    $('.show-more-tricks').html(data.tricks_html);
+                }
             }
         },
         error: function(xhr) {

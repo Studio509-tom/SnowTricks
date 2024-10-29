@@ -1,3 +1,13 @@
+{% for message in app.flashes('error') %}
+	<div class="alert alert-danger">
+		{{ message }}
+	</div>
+{% endfor %}
+{% for message in app.flashes('success') %}
+	<div class="alert alert-success">
+		{{ message }}
+	</div>
+{% endfor %}
 {{ form_start(form, { 'attr': { 'enctype': 'multipart/form-data' } }) }}
 {{ form_row(form.title) }}
 {{ form_row(form.content) }}

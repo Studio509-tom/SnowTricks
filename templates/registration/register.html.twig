@@ -18,11 +18,18 @@
 				<label for="{{ field_name(registrationForm.email) }}">Email</label>
 				<input name="{{ field_name(registrationForm.email) }}" class="form-control">
 
+				<label for="{{ field_name(registrationForm.lastname) }}">Nom</label>
+				<input name="{{ field_name(registrationForm.lastname) }}" class="form-control">
+				
+				<label for="{{ field_name(registrationForm.firstname) }}">Prénom</label>
+				<input name="{{ field_name(registrationForm.firstname) }}" class="form-control">
+
+
 				<label for="{{ field_name(registrationForm.plainPassword) }}">Mots de passe</label>
 				<input name="{{ field_name(registrationForm.plainPassword) }}" class="form-control">
 
 				<label for="{{ field_name(registrationForm.agreeTerms) }}">J'accepte les termes</label>
-                <input class="mt-3" type="checkbox" name="{{ field_name(registrationForm.agreeTerms) }}">
+				<input class="mt-3" type="checkbox" name="{{ field_name(registrationForm.agreeTerms) }}">
 				<div class="buttons-register mt-3">
 					<button type="submit" class="btn btn-primary">S'enregistrer</button>
 				</div>

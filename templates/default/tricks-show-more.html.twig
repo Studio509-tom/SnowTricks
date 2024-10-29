@@ -6,7 +6,13 @@
 					<div class="col-4 mt-3">
 						<a href="{{path("app_trick_show" , { "id" : trick.id} )}}">
 							<div class="trick-resume">
+							{% if trick.getFirstFile() is defined and trick.getFirstFile() != null %}
+								{% for first_file in trick.getFirstFile() %}
+									<img class="picture-multiple-trick" src="{{asset('files/tricks/' ~ trick.id ~ "/" ~ first_file )}}" alt="no picture">
+								{% endfor %}
+							{% else %}
 								<img class="picture-multiple-trick" src="{{asset('files/defaults/no-picture.jpg')}}" alt="no picture">
+							{% endif %}
 								<p class="title">{{trick.title}}</p>
 								{% if is_granted("IS_AUTHENTICATED") %}
 									<div class="link-change-trick">
@@ -23,12 +29,17 @@
 					</div>
 				{% endif %}
 			{% else %}
-
 				{% if loop.index <= number_tricks %}
 					<div class="col-4 mt-3">
 						<a href="{{path("app_trick_show" , { "id" : trick.id} )}}">
 							<div class="trick-resume">
+							{% if trick.getFirstFile() is defined and trick.getFirstFile() != null %}
+								{% for first_file in trick.getFirstFile() %}
+									<img class="picture-multiple-trick" src="{{asset('files/tricks/' ~ trick.id ~ "/" ~ first_file )}}" alt="no picture">
+								{% endfor %}
+							{% else %}
 								<img class="picture-multiple-trick" src="{{asset('files/defaults/no-picture.jpg')}}" alt="no picture">
+							{% endif %}
 								<p class="title">{{trick.title}}</p>
 								{% if is_granted("IS_AUTHENTICATED") %}
 									<div class="link-change-trick">
@@ -44,7 +55,6 @@
 						</a>
 					</div>
 				{% endif %}
-
 			{% endif %}
 		{% endfor %}
 		{% if number_tricks is defined %}

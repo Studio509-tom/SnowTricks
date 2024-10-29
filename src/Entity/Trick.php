@@ -20,7 +20,7 @@ class Trick
     #[ORM\Column(length: 255)]
     private ?string $title = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(type:"text")]
     private ?string $content = null;
 
     #[ORM\Column(type: 'json', nullable: true)]
@@ -45,8 +45,11 @@ class Trick
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $date_modify = null;
 
-    #[ORM\Column(type: "json" , nullable: true)]
+    #[ORM\Column(type: "json", nullable: true)]
     private ?array $first_file = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $title_for_url = null;
 
     public function __construct()
     {
@@ -180,6 +183,18 @@ class Trick
     public function setFirstFile(?array $first_file): static
     {
         $this->first_file = $first_file;
+
+        return $this;
+    }
+
+    public function getTitleForUrl(): ?string
+    {
+        return $this->title_for_url;
+    }
+
+    public function setTitleForUrl(string $title_for_url): static
+    {
+        $this->title_for_url = $title_for_url;
 
         return $this;
     }

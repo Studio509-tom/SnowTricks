@@ -10,7 +10,6 @@ class DefaultController extends AbstractController
     #[Route('/', name: 'app_default')]
     public function index(TrickRepository $trickRepository): Response
     {
-
         $tricks = $trickRepository->findAll();
         return $this->render('default/index.html.twig', [
             'controller_name' => 'DefaultController',

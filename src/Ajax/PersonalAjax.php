@@ -18,13 +18,13 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 class PersonalAjax extends AbstractController
 {
     function __construct(RequestStack $requestStack)
-   {
-      if (!$requestStack->getCurrentRequest()->isXmlHttpRequest()) {
-         throw new \TypeError("Accès refuser");
-      }
-   }
+    {
+        if (!$requestStack->getCurrentRequest()->isXmlHttpRequest()) {
+            throw new \TypeError("Accès refuser");
+        }
+    }
 
-   #[IsGranted('IS_AUTHENTICATED')]
+    #[IsGranted('ROLE_USER')]
     #[Route('/avatar', name: 'app_avatar_ajax', methods: ['POST'])]
     public function changeAvatar(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): JsonResponse
     {
@@ -41,13 +41,13 @@ class PersonalAjax extends AbstractController
             $safeFilename = $slugger->slug($originalFilename);
             // Crée le nom unique de l'image avec son extension
             $newFilename = $safeFilename . '-' . uniqid() . '.' . $profilePictureFile->guessExtension();
-            $path = 'C:\Users\Tom\Documents\Sites_internet\SnowTricks\Site\SnowTricks\assets\files\users\\' . $userId;
+            $path = 'C:\Users\Tom\Documents\Sites_internet\SnowTricks\Site\assets\files\users\\' . $userId;
             $folder_exist = is_dir($path);
             // Vérifier si le dossier existe
             if (!$folder_exist) {
                 mkdir($path);
             } else {
-                  // Récupérer tous les fichiers dans le dossier
+                // Récupérer tous les fichiers dans le dossier
                 $files = scandir($path);
                 foreach ($files as $file) {
                     // Ignorer les répertoires . et ..
@@ -70,7 +70,7 @@ class PersonalAjax extends AbstractController
                 "avatar_file" => $newFilename,
             ]);
 
-            return new JsonResponse(['html_avatar' => $html_avatar->getContent() , 'error' => false]);
+            return new JsonResponse(['html_avatar' => $html_avatar->getContent(), 'error' => false]);
         }
 
         return new JsonResponse(['error' => true]);

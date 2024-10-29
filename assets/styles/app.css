@@ -10,6 +10,16 @@ body{
     font-style: normal ;
     src: url('../styles/fonts/Montserrat/Montserrat-VariableFont_wght.ttf')format('truetype') ;
 }
+
+h1{
+    text-align: center;
+}
+.user-info-comment{
+    display : block;
+}
+.name-user{
+    display: flex;
+}
 .nav-element{
     display: flex;
     justify-content: space-evenly;

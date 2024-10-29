@@ -18,6 +18,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\Form\Type\DoctrineType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+
 #[Route('/ajax/comment')]
 final class CommentAjax extends AbstractController
 {
@@ -29,8 +30,8 @@ final class CommentAjax extends AbstractController
         }
     }
 
-    #[Route('/new', name: 'app_ajax_comment_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, ManagerRegistry $doctrine, CommentRepository $commentRepository, UserRepository $userRepository): Response
+    #[Route('/new/{trick}', name: 'app_ajax_comment_new', methods: ['GET', 'POST'])]
+    public function new(Request $request, Trick $trick, EntityManagerInterface $entityManager, ManagerRegistry $doctrine, CommentRepository $commentRepository, UserRepository $userRepository): Response
     {
         $comment = new Comment();
         // Associer le commentaire à l'entité User
@@ -40,16 +41,12 @@ final class CommentAjax extends AbstractController
         $form_comment->handleRequest($request);
 
         if ($form_comment->isSubmitted() && $form_comment->isValid()) {
-            // Récupérer l'ID du Trick à partir du champ caché
-            $trickId = $form_comment->get('trick')->getData();
-            // Récupérer l'entité Trick correspondante 
-            $trick = $doctrine->getRepository(Trick::class)->find($trickId);
             // Associer le commentaire à l'entité Trick
             $comment->setTrick($trick);
 
             $entityManager->persist($comment);
             $entityManager->flush();
-            $comments = $commentRepository->findBy(['trick' => $trick->getId()] , array('id' => 'DESC'));
+            $comments = $commentRepository->findBy(['trick' => $trick->getId()], array('id' => 'DESC'));
 
             $users = $userRepository->findAll();
             $arr_users = [];
@@ -90,8 +87,10 @@ final class CommentAjax extends AbstractController
         $users = $userRepository->findAll();
         $arr_users = [];
         $trick = $comment->getTrick();
+
         // Récupérer l'entité Trick correspondante 
-        $comments = $commentRepository->findBy(['trick' => $trick->getId()] , array('id' => 'DESC'));
+        $comments = $commentRepository->findBy(['trick' => $trick->getId()], array('id' => 'DESC'));
+
         foreach ($comments as $com) {
             foreach ($users as $user) {
                 if ($user->getId() == $com->getUser()->getId()) {
@@ -99,14 +98,16 @@ final class CommentAjax extends AbstractController
                 }
             }
         }
+
         if ($form_comment->isSubmitted() && $form_comment->isValid()) {
             // Récupérer l'ID du Trick à partir du champ caché
-            $trickId = $form_comment->get('trick')->getData();
+            $trickId = $trick->getId();
             // Récupérer l'entité Trick correspondante 
             $trick = $doctrine->getRepository(Trick::class)->find($trickId);
             $entityManager->flush();
             // Récupérer les commentaires actualisés
-            $comments = $commentRepository->findBy(['trick' => $trick->getId()]);
+            $comments = $commentRepository->findBy(['trick' => $trick->getId()], array('id' => 'DESC'));
+
             $comments_html = $this->render('trick/comments.html.twig', [
                 'modify' => FALSE,
                 'comments' => $comments,
@@ -123,7 +124,6 @@ final class CommentAjax extends AbstractController
         foreach ($comments as $com) {
             $forms[$com->getId()] = $this->createForm(CommentType::class, $com)->createView();
         }
-
 
         // Rendu de la vue Twig avec le formulaire spécifique pour la modification
         $edit_html = $this->render('trick/comments.html.twig', [
@@ -146,7 +146,7 @@ final class CommentAjax extends AbstractController
             $entityManager->remove($comment);
             $entityManager->flush();
             $trick = $comment->getTrick();
-            $comments = $commentRepository->findBy(['trick' => $trick->getId()] , array('id' => 'DESC'));
+            $comments = $commentRepository->findBy(['trick' => $trick->getId()], array('id' => 'DESC'));
             $users = $userRepository->findAll();
             $arr_users = [];
             foreach ($comments as $com) {
@@ -181,6 +181,4 @@ final class CommentAjax extends AbstractController
 
         return new JsonResponse(['confirm_delete' => $delete_confirm_html->getContent()]);
     }
-
-    
 }

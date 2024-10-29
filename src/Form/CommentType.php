@@ -19,7 +19,7 @@ class CommentType extends AbstractType
     {
         $builder
             ->add('content' ,TextareaType::class , [
-                "label" => "Commentaire :"
+                "label" => 'Commentaire :'
             ])
             ->add('trick' ,HiddenType::class, [
                 'data' => $options['trick'] ? $options['trick']->getId() : null, // Si Trick existe, utiliser son ID
