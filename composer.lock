@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4abef1b7db3e9ab0dfa9cdf5cf54cfe4",
+    "content-hash": "76f1569c7f2a40e19a3a30b2616ec5af",
     "packages": [
         {
             "name": "composer/semver",
@@ -10346,16 +10346,16 @@
         },
         {
             "name": "zenstruck/foundry",
-            "version": "v2.0.9",
+            "version": "v2.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zenstruck/foundry.git",
-                "reference": "b0a5d3d8b43acd4b0f356c6dcfdec6c8ebff1c08"
+                "reference": "a549c10c27b83eee52807b6be4f56cb578b51566"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zenstruck/foundry/zipball/b0a5d3d8b43acd4b0f356c6dcfdec6c8ebff1c08",
-                "reference": "b0a5d3d8b43acd4b0f356c6dcfdec6c8ebff1c08",
+                "url": "https://api.github.com/repos/zenstruck/foundry/zipball/a549c10c27b83eee52807b6be4f56cb578b51566",
+                "reference": "a549c10c27b83eee52807b6be4f56cb578b51566",
                 "shasum": ""
             },
             "require": {
@@ -10392,6 +10392,9 @@
                     "target-directory": "bin/tools",
                     "bin-links": true,
                     "forward-command": false
+                },
+                "psalm": {
+                    "pluginClass": "Zenstruck\\Foundry\\Psalm\\FoundryPlugin"
                 }
             },
             "autoload": {
@@ -10401,7 +10404,8 @@
                     "src/phpunit_helper.php"
                 ],
                 "psr-4": {
-                    "Zenstruck\\Foundry\\": "src/"
+                    "Zenstruck\\Foundry\\": "src/",
+                    "Zenstruck\\Foundry\\Psalm\\": "utils/psalm"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -10431,7 +10435,7 @@
             ],
             "support": {
                 "issues": "https://github.com/zenstruck/foundry/issues",
-                "source": "https://github.com/zenstruck/foundry/tree/v2.0.9"
+                "source": "https://github.com/zenstruck/foundry/tree/v2.2.0"
             },
             "funding": [
                 {
@@ -10439,7 +10443,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-09-02T18:20:52+00:00"
+            "time": "2024-10-24T12:17:15+00:00"
         }
     ],
     "aliases": [],
