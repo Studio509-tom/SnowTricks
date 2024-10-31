@@ -2,8 +2,9 @@
 	<div class="row">
 		<div class="show-trick-parent col-12">
 			<h1>{{trick.title}}</h1>
-			{% if first_file_defined is not null %}
+			{% if first_file_defined != false %}
 				<div class="first-file">
+					test
 					<img src="{{asset('files/tricks/' ~ trick.id ~ '/' ~ first_file )}}" alt="Image du trick">
 				</div>
 			{% endif %}

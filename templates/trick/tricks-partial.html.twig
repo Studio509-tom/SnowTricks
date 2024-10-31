@@ -1,8 +1,8 @@
 <div class="container">
 	<div class="row">
 		{% for message in app.flashes('error') %}
-		<div class="alert alert-danger">
-			{{ message }}
+			<div class="alert alert-danger">
+				{{ message }}
 			</div>
 		{% endfor %}
 		{% for message in app.flashes('success') %}
@@ -10,28 +10,28 @@
 				{{ message }}
 			</div>
 		{% endfor %}
-	{% for trick in tricks %}
+		{% for trick in tricks %}
 
-		<div class="col-4 mt-3">
-			<a href="{{path("app_trick_show" , { "id" : trick.id} )}}">
-				<div class="trick-resume">
-					<img class="picture-multiple-trick" src="{{asset('files/defaults/no-picture.jpg')}}" alt="no picture">
-					<p class="title">{{trick.title}}</p>
-					{% if is_granted("ROLE_ADMIN") or trick.getUser().getId() == app.user.id %}
-						<div class="link-change-trick">
-							<a class="btn btn-light edit-trick" href="{{ path('app_ajax_trick_edit', {'id': trick.id}) }}">
-								<i class="fas fa-pencil"></i>
-							</a>
-							<a class="btn btn-light delete-pop-up" href="{{ path('app_ajax_trick_delete', {'id': trick.id}) }}">
-								<i class="fas fa-trash-can"></i>
-							</a>
-						</div>
-					{% endif %}
-				</div>
+			<div class="col-4 mt-3">
+				<a href="{{path("app_trick_show" , { "slug" : trick.slug } )}}">
+					<div class="trick-resume">
+						<img class="picture-multiple-trick" src="{{asset('files/defaults/no-picture.jpg')}}" alt="no picture">
+						<p class="title">{{trick.title}}</p>
+						{% if is_granted("ROLE_ADMIN") or trick.getUser().getId() == app.user.id %}
+							<div class="link-change-trick">
+								<a class="btn btn-light edit-trick" href="{{ path('app_ajax_trick_edit', {'id': trick.id}) }}">
+									<i class="fas fa-pencil"></i>
+								</a>
+								<a class="btn btn-light delete-pop-up" href="{{ path('app_ajax_trick_delete', {'id': trick.id}) }}">
+									<i class="fas fa-trash-can"></i>
+								</a>
+							</div>
+						{% endif %}
+					</div>
 
-			</a>
-		</div>
-	{% endfor %}
+				</a>
+			</div>
+		{% endfor %}
 
 	</div>
 </div>

@@ -20,7 +20,7 @@ class Trick
     #[ORM\Column(length: 255)]
     private ?string $title = null;
 
-    #[ORM\Column(type:"text")]
+    #[ORM\Column(type: "text")]
     private ?string $content = null;
 
     #[ORM\Column(type: 'json', nullable: true)]
@@ -49,7 +49,7 @@ class Trick
     private ?array $first_file = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $title_for_url = null;
+    private ?string $slug = null;
 
     public function __construct()
     {
@@ -187,14 +187,14 @@ class Trick
         return $this;
     }
 
-    public function getTitleForUrl(): ?string
+    public function getSlug(): ?string
     {
-        return $this->title_for_url;
+        return $this->slug;
     }
 
-    public function setTitleForUrl(string $title_for_url): static
+    public function setSlug(string $slug): static
     {
-        $this->title_for_url = $title_for_url;
+        $this->slug = $slug;
 
         return $this;
     }

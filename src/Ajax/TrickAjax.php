@@ -43,8 +43,11 @@ final class TrickAjax extends AbstractController
          if ($form->isValid()) {
             // Vérification que le nom n'est pas déjà enregistrer
             $title_trick = $trick->getTitle();
-            $occurence_title = $trickRepository->findByTitle($title_trick);
-            if (!empty($occurence_title)) {
+            $slug = $this->slugify($title_trick);
+            $trick->setSlug($slug);
+            $occurence_title = $trickRepository->findBy(['title_for_url' => $slug]);
+            
+            if (!empty($occurence_title) ) {
                $this->addFlash('error', 'Le titre de cette article est déjà utilisé.');
                $create_html = $this->render('trick/new.html.twig', [
                   'trick' => $trick,
@@ -52,8 +55,8 @@ final class TrickAjax extends AbstractController
                   'first_file_defined' => null,
                   'error' => true
                ]);
-         
-               return new JsonResponse(['edit_html' => $create_html->getContent() , 'error' => true]);
+
+               return new JsonResponse(['edit_html' => $create_html->getContent(), 'error' => true]);
             }
             $primaryImage = $request->files->get('primary_image');
             if ($primaryImage) {
@@ -312,6 +315,9 @@ final class TrickAjax extends AbstractController
          // Mise à jour de l'entité Trick avec les fichiers actualisés
          $trick->setFiles(array_values($existingFiles));
 
+         $title_trick = $trick->getTitle();
+         $slug = $this->slugify($title_trick);
+         $trick->setSlug($slug);
          $entityManager->flush();
          $first_file = $trick->getFirstFile();
          // Si on est sur la page des tricks
@@ -385,5 +391,22 @@ final class TrickAjax extends AbstractController
       ]);
 
       return new JsonResponse(['confirm_delete' => $delete_confirm_html->getContent()]);
+   }
+
+   function slugify($text)
+   {
+      // Remplacer les accents par leur équivalent ASCII
+      $text = iconv('UTF-8', 'ASCII//TRANSLIT', $text);
+      // Remplacer les espaces par des tirets
+      $text = str_replace(' ', '-', $text);
+      // Supprimer les caractères non-alphabétiques et non-numériques sauf les tirets
+      $text = preg_replace('/[^a-zA-Z0-9\-]/', '', $text);
+      // Remplacer plusieurs tirets consécutifs par un seul
+      $text = preg_replace('/-+/', '-', $text);
+      // Supprimer les tirets en début et fin de chaîne
+      $text = trim($text, '-');
+      // Passer en minuscules
+      $text = strtolower($text);
+      return $text;
    }
 }
