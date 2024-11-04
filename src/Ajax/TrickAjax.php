@@ -16,12 +16,15 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Form\FormErrorIterator;
+use Symfony\Component\Routing\RouterInterface;
 
 #[Route('/ajax/trick')]
 final class TrickAjax extends AbstractController
 {
-   function __construct(RequestStack $requestStack)
+   private $filesDirectory, $imageLocation; 
+   function __construct(RequestStack $requestStack , $filesDirectory)
    {
+      $this->imageLocation = $filesDirectory;
       if (!$requestStack->getCurrentRequest()->isXmlHttpRequest()) {
          throw new \TypeError("Accès refuser");
       }
@@ -45,9 +48,9 @@ final class TrickAjax extends AbstractController
             $title_trick = $trick->getTitle();
             $slug = $this->slugify($title_trick);
             $trick->setSlug($slug);
-            $occurence_title = $trickRepository->findBy(['title_for_url' => $slug]);
-            
-            if (!empty($occurence_title) ) {
+            $occurence_title = $trickRepository->findBy(['slug' => $slug]);
+            // Si l'occurence est trouver 
+            if (!empty($occurence_title)) {
                $this->addFlash('error', 'Le titre de cette article est déjà utilisé.');
                $create_html = $this->render('trick/new.html.twig', [
                   'trick' => $trick,
@@ -66,6 +69,7 @@ final class TrickAjax extends AbstractController
                // Hashage pour supprimer le doublon lors de l'enregistrement plus bas
                $hash_first_file = hash('sha256', $imageContent);
             }
+            // Définition de la date de création
             date_default_timezone_set('Europe/Paris');
             $date_creation = new \DateTime(date('Y-m-d H:i:s'));
             $trick->setDateCreate($date_creation);
@@ -115,7 +119,11 @@ final class TrickAjax extends AbstractController
 
             $entityManager->persist($trick);
             $entityManager->flush();
-            $path = 'C:\Users\Tom\Documents\Sites_internet\SnowTricks\Site\assets\files\tricks\\' . $trick->getId();
+            $path = $this->imageLocation . 'tricks\\' . $trick->getId();
+            // Création du dossier du trick
+            mkdir($path);
+
+            // Traitement si il n'y a pas eu d'image mis en avant
             if (!$image_empty) {
                for ($i = 0; $i < count($files_entity); $i++) {
                   $file =  $files_entity[$i];
@@ -133,6 +141,7 @@ final class TrickAjax extends AbstractController
             $this->addFlash('success', 'Article correctement crée');
             // Récupération des tricks
             $tricks = $trickRepository->findAll();
+            // Retour JSON
             $tricks_html = $this->render('trick/tricks-partial.html.twig', [
                "tricks" => $tricks,
                'date_create' => $date_creation
@@ -163,11 +172,13 @@ final class TrickAjax extends AbstractController
 
    #[IsGranted('ROLE_USER')]
    #[Route('/{id}/edit', name: 'app_ajax_trick_edit', methods: ['GET', 'POST'])]
-   public function edit(Request $request, Trick $trick, EntityManagerInterface $entityManager, TrickRepository $trickRepository, SluggerInterface $slugger): Response
+   public function edit(Request $request, Trick $trick, EntityManagerInterface $entityManager, TrickRepository $trickRepository, SluggerInterface $slugger, RouterInterface $router): Response
    {
       $form = $this->createForm(TrickType::class, $trick);
       $form->handleRequest($request);
       $link_referer = $request->headers->get('referer');
+      $refererPathInfo = Request::create($link_referer)->getPathInfo();
+      $refererPathInfo = str_replace($request->getScriptName(), '', $refererPathInfo);
       $filesystem = new Filesystem();
       $first_file_arr = null;
       $existingFiles = $trick->getFiles();
@@ -197,7 +208,7 @@ final class TrickAjax extends AbstractController
             return new JsonResponse(['edit_html' => $edit_html->getContent(), 'error' => true]);
          }
 
-         $path = 'C:\Users\Tom\Documents\Sites_internet\SnowTricks\Site\assets\files\tricks\\' . $trick->getId();
+         $path = $this->imageLocation . 'tricks\\' . $trick->getId();
          $primaryImage = $request->files->get('primary_image');
          // Si l'images n'est pas envoyer sous format images mais text (qu'elle est déjà enregistré)
          if (is_null($primaryImage)) {
@@ -321,7 +332,7 @@ final class TrickAjax extends AbstractController
          $entityManager->flush();
          $first_file = $trick->getFirstFile();
          // Si on est sur la page des tricks
-         if ($link_referer == "https://127.0.0.1:8000/trick") {
+         if ($refererPathInfo == "/trick") {
             $tricks = $trickRepository->findAll();
             $tricks_html = $this->render('trick/tricks-partial.html.twig', [
                "tricks" => $tricks,
@@ -331,7 +342,7 @@ final class TrickAjax extends AbstractController
             ]);
             return new JsonResponse(['tricks_html' => $tricks_html->getContent(), 'page' => 'tricks']);
             // Si on est sur la page d'accueil
-         } else if ($link_referer == "https://127.0.0.1:8000/") {
+         } else if ($refererPathInfo == "/") {
             $tricks = $trickRepository->findAll();
             $tricks_html = $this->render('default/tricks-show-more.html.twig', [
                "tricks" => $tricks,
@@ -342,7 +353,7 @@ final class TrickAjax extends AbstractController
             ]);
             return new JsonResponse(['tricks_html' => $tricks_html->getContent(), 'page' => 'home']);
          }
-         // Sui on est sur la page d'un trick
+         // Si on est sur la page d'un trick
          else {
             $trick_html = $this->render('trick/show-partial.html.twig', [
                "trick" => $trick,
@@ -365,18 +376,22 @@ final class TrickAjax extends AbstractController
       return new JsonResponse(['edit_html' => $edit_html->getContent()]);
    }
 
-   #[IsGranted('ROLE_USER')]
+   #[IsGranted('IS_AUTHENTICATED')]
    #[Route('/{id}', name: 'app_ajax_trick_delete', methods: ['POST'])]
    public function delete(Request $request, Trick $trick, EntityManagerInterface $entityManager, TrickRepository $trickRepository): Response
    {
 
       if ($this->isCsrfTokenValid('delete' . $trick->getId(), $request->getPayload()->getString('_token'))) {
-         $id_trick = $trick->getId();
+         $slug = $trick->getSlug();
          $entityManager->remove($trick);
          $entityManager->flush();
          $tricks = $trickRepository->findAll();
          $link_referer = $request->headers->get('referer');
-         if ($link_referer == ("https://127.0.0.1:8000/trick/" . strval($id_trick))) {
+         $refererPathInfo = Request::create($link_referer)->getPathInfo();
+         $refererPathInfo = str_replace($request->getScriptName(), '', $refererPathInfo);
+        
+         if ($refererPathInfo == ('/trick/' . $slug)) {
+            
             return new JsonResponse(['url_redirect' => $this->generateUrl('app_trick_index'), "redirection" => TRUE]);
          }
          $tricks_html = $this->render('trick/tricks-partial.html.twig', [

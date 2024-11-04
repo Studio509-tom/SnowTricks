@@ -46,10 +46,13 @@ final class CommentAjax extends AbstractController
 
             $entityManager->persist($comment);
             $entityManager->flush();
+            // Récupération des commentaires du plus récent au plus vieux
             $comments = $commentRepository->findBy(['trick' => $trick->getId()], array('id' => 'DESC'));
-
+            // Récupération de tout les users
             $users = $userRepository->findAll();
             $arr_users = [];
+
+            // Récupération des users qui on déjà commenter
             foreach ($comments as $com) {
                 foreach ($users as $user) {
                     if ($user->getId() == $com->getUser()->getId()) {
@@ -57,6 +60,7 @@ final class CommentAjax extends AbstractController
                     }
                 }
             }
+            // Retour
             $comments_html = $this->render('trick/comments.html.twig', [
                 "trick" => $trick,
                 "comments" => $comments,
@@ -142,10 +146,12 @@ final class CommentAjax extends AbstractController
     public function delete(Request $request, Comment $comment, EntityManagerInterface $entityManager, CommentRepository $commentRepository, UserRepository $userRepository): Response
     {
         if ($this->isCsrfTokenValid('delete' . $comment->getId(), $request->getPayload()->getString('_token'))) {
-
+            // Supprimer l'entité
             $entityManager->remove($comment);
             $entityManager->flush();
+            // Récupération du trick
             $trick = $comment->getTrick();
+            // Récupération des commentaires correspondant au trick
             $comments = $commentRepository->findBy(['trick' => $trick->getId()], array('id' => 'DESC'));
             $users = $userRepository->findAll();
             $arr_users = [];

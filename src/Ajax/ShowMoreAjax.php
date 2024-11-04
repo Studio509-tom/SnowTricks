@@ -35,7 +35,7 @@ final class ShowMoreAjax extends AbstractController
     {
         // Récupération du POST
         $number_length = (int) $request->request->get('trick_count');
-
+        // Vérification du nombre d'élément afficher 
         if ($number_length >= 6) {
             $number_length = $number_length + 6;
             $tricks = $trickRepository->findBy(
@@ -50,6 +50,7 @@ final class ShowMoreAjax extends AbstractController
                  $number_length
             );
         }
+        // Retour JSON
         $html_tricks = $this->render('default/tricks-show-more.html.twig', [
             "tricks" => $tricks,
             "number_tricks" => $number_length
@@ -62,13 +63,13 @@ final class ShowMoreAjax extends AbstractController
     public function showMoreComments(Request $request,UserRepository $userRepository, CommentRepository $commentRepository, TrickRepository $trickRepository): Response
     {
         // Récupération du POST
-        $number_length = $request->request->get('comment_count');
+        $number_length = (int) $request->request->get('comment_count');
         $id_trick = $request->request->get('id_trick');
         $trick = new Trick();
         $trick = $trickRepository->findById($id_trick);
 
-        if ((int) $number_length >= 6) {
-            $number_length = (int) $number_length + 6;
+        if  ($number_length >= 6) {
+            $number_length = $number_length + 6;
             $comments = $commentRepository->findBy(
                 ['trick' => $trick],
                 null,
@@ -78,7 +79,7 @@ final class ShowMoreAjax extends AbstractController
             $comments = $commentRepository->findBy(
                 ['trick' => $trick],
                 null,
-                (int) $number_length
+                $number_length
             );
         }
         $users = $userRepository->findAll();

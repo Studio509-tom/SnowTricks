@@ -198,4 +198,20 @@ class Trick
 
         return $this;
     }
+    function slugify($text)
+   {
+      // Remplacer les accents par leur équivalent ASCII
+      $text = iconv('UTF-8', 'ASCII//TRANSLIT', $text);
+      // Remplacer les espaces par des tirets
+      $text = str_replace(' ', '-', $text);
+      // Supprimer les caractères non-alphabétiques et non-numériques sauf les tirets
+      $text = preg_replace('/[^a-zA-Z0-9\-]/', '', $text);
+      // Remplacer plusieurs tirets consécutifs par un seul
+      $text = preg_replace('/-+/', '-', $text);
+      // Supprimer les tirets en début et fin de chaîne
+      $text = trim($text, '-');
+      // Passer en minuscules
+      $text = strtolower($text);
+      return $text;
+   }
 }

@@ -66,31 +66,37 @@ class ChangePasswordController extends AbstractController
     #[Route('/oublie-mots-de-passe', 'app_forgot_password')]
     public function forgotPassword(Request $request, UserRepository $userRepository, TokenGeneratorInterface $tokenGenerator, EntityManagerInterface $entityManager, MailerInterface $mailer): Response
     {
+        // Création du formulaire pour saisir l'adresse e-mail
+
         $form = $this->createForm(ForgotPasswordType::class);
         $form->handleRequest($request);
+        // Vérifie si le formulaire a été soumis et est valide
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Récupère l'email saisi dans le formulaire
             $email = $form->get('email')->getData();
+            // Recherche l'utilisateur associé à cet email
             $user = $userRepository->findOneBy(['email' => $email]);
-
+            // Si aucun utilisateur n'est trouvé, affiche un message d'erreur et redirige vers la même page
             if (!$user) {
                 $this->addFlash('danger', 'Vérifier votre boite mail !');
                 return $this->redirectToRoute('app_forgot_password');
             }
+            // Génère un token de réinitialisation de mot de passe
             $token = $tokenGenerator->generateToken();
-
+            // Attribue le token à l'utilisateur et sauvegarde en base de données
             $user->setResetToken($token);
             $entityManager->flush();
-
+            // Génère une URL vers la page de réinitialisation du mot de passe avec le token
             $url = $this->generateUrl('app_reset_password', array('token' => $token), UrlGeneratorInterface::ABSOLUTE_URL);
-
+            // Prépare l'email pour la réinitialisation du mot de passe
             $email_message = (new Email())
                 ->from(new Address('tom@studio509.fr', 'TomCorp'))
                 ->to((string) $user->getEmail())
                 ->subject("Confirmation de l'adresse email")
                 ->html('<p>Pour réinitialiser votre mot de passe, veuillez cliquer sur le lien suivant : <a href="' . $url .
                     '">Réinitialiser mon mot de passe</a></p>');
-
+            // Envoyer l'email
             $mailer->send($email_message);
         }
 
@@ -108,6 +114,7 @@ class ChangePasswordController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
 
             /** @var \App\Entity\User $user */
+            // Vérifier si le token correspond
             $user = $userRepository->findOneBy(['resetToken' => $token]);
 
             if ($user === NULL) {
@@ -116,7 +123,7 @@ class ChangePasswordController extends AbstractController
             }
             $password = $form->get('password')->getData();
             $confirm_password = $form->get('confirmPassword')->getData();
-            
+            // Vérifier si les deux mots de passe rentré sont identique
             if (strcmp($password, $confirm_password) === 0) {
                 $user->setResetToken(null);
                 $user->setPassword($passwordHasher->hashPassword($user, $password));

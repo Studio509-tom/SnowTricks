@@ -17,8 +17,10 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 #[Route('/ajax/profile')]
 class PersonalAjax extends AbstractController
 {
-    function __construct(RequestStack $requestStack)
+    private $filesDirectory, $imageLocation;
+    function __construct(RequestStack $requestStack, $filesDirectory)
     {
+        $this->imageLocation = $filesDirectory;
         if (!$requestStack->getCurrentRequest()->isXmlHttpRequest()) {
             throw new \TypeError("Accès refuser");
         }
@@ -41,7 +43,7 @@ class PersonalAjax extends AbstractController
             $safeFilename = $slugger->slug($originalFilename);
             // Crée le nom unique de l'image avec son extension
             $newFilename = $safeFilename . '-' . uniqid() . '.' . $profilePictureFile->guessExtension();
-            $path = 'C:\Users\Tom\Documents\Sites_internet\SnowTricks\Site\assets\files\users\\' . $userId;
+            $path = $this->imageLocation . '\users\\' . $userId;
             $folder_exist = is_dir($path);
             // Vérifier si le dossier existe
             if (!$folder_exist) {
