@@ -15,6 +15,10 @@ class ChangePasswordType extends AbstractType
     {
         $builder
         ->add('oldPassword', PasswordType::class, [
+            'label' => 'ancien mots de passe',
+            'attr' => array(
+                'class' => 'form-control'
+            ),
             'mapped' => false, 
             'constraints' => [
                 new NotBlank([
@@ -23,6 +27,10 @@ class ChangePasswordType extends AbstractType
             ],
         ])
         ->add('newPassword', PasswordType::class, [
+            'label' => 'nouveau mots de passe',
+            'attr' => array(
+                'class' => 'form-control'
+            ),
             'mapped' => false, 
             'constraints' => [
                 new NotBlank([

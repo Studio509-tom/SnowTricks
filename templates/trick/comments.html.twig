@@ -7,6 +7,8 @@
 <div class="show-more-comments">
 	{% include "trick/comments-partial.html.twig" %}
 </div>
-<div class="button-show-all">
-	<a class="btn btn-light btn-show-more-comments" href="{{path('app_ajax_comment_show_more')}}">Afficher plus</a>
-</div>
+{% if app.user.id is defined %}
+	<div class="button-show-all">
+		<a class="btn btn-light btn-show-more-comments" href="{{path('app_ajax_comment_show_more')}}">Afficher plus</a>
+	</div>
+{% endif %}

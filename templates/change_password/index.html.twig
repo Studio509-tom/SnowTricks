@@ -1,17 +1,27 @@
 {% extends 'base.html.twig' %}
 {% block body %}
-		<h1>Changer le mot de passe</h1>
+	<h1 class="mt-4">Changer le mot de passe</h1>
 
-		{{ form_start(changePasswordForm) }}
-		{{ form_row(changePasswordForm.oldPassword) }}
-		{{ form_row(changePasswordForm.newPassword) }}
-		<button class="btn">Modifier le mot de passe</button>
-		{{ form_end(changePasswordForm) }}
-
-		
-		{% for message in app.flashes('error') %}
-			<div class="alert alert-danger">
-				{{ message }}
+	{{ form_start(changePasswordForm) }}
+	<div class="container">
+		<div class="row">
+			<div class="col-12 mt-3">
+				{{ form_row(changePasswordForm.oldPassword)}}
 			</div>
-		{% endfor %}
+			<div class="col-12">
+
+				{{ form_row(changePasswordForm.newPassword)}}
+			</div>
+			<div class="mt-3 text-center">
+				<button class="btn-change-password btn btn-light">Modifier le mot de passe</button>
+			</div>
+			{{ form_end(changePasswordForm) }}
+		</div>
+	</div>
+
+	{% for message in app.flashes('error') %}
+		<div class="alert alert-danger">
+			{{ message }}
+		</div>
+	{% endfor %}
 {% endblock %}

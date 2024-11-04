@@ -8,41 +8,65 @@
 		</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-		<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-		{% block stylesheets %}{% endblock %}
+		<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"> {% block stylesheets %}{% endblock %}
 
 
-	</head>
-	<body class="body">
-		{% block javascripts %}
+		</head>
+		<body class="body">
 			<div class="nav-bar">
-				<img class="logo-element" src="{{asset('files/defaults/logo-ST.png')}}" alt="logo">
+				<img
+				class="logo-element" src="{{ asset('files/defaults/logo-ST.png') }}" alt="logo">
+
+				<!-- Bouton pour le menu mobile -->
+				<div class="mobile-menu-icon">
+					<i class="fas fa-bars"></i>
+				</div>
+
+				<!-- Menu Desktop -->
 				<div class="nav-element">
-					<a class="ref-nav" href="{{path('app_default')}}">Page d'accueil</a>
+					<a class="ref-nav" href="{{ path('app_default') }}">Page d'accueil</a>
 					|
-					<a class="ref-nav" href="{{path('app_trick_index')}}">Tricks</a>
+					<a class="ref-nav" href="{{ path('app_trick_index') }}">Tricks</a>
 					|
 					{% if app.user %}
-						<a class="ref-nav" href="{{path('app_personal_index')}}">Page Perso</a>
+						<a class="ref-nav" href="{{ path('app_personal_index') }}">Page Perso</a>
 						|
-						<a class="ref-nav" href="{{path('app_logout')}}">Deconnexion</a>
+						<a class="ref-nav" href="{{ path('app_logout') }}">Deconnexion</a>
 					{% else %}
-						<a class="ref-nav" href="{{path('app_login')}}">Connexion</a>
+						<a class="ref-nav" href="{{ path('app_login') }}">Connexion</a>
 						|
-						<a class="ref-nav" href="{{path('app_register')}}">Enregistrement</a>
+						<a class="ref-nav" href="{{ path('app_register') }}">Enregistrement</a>
+					{% endif %}
+				</div>
+
+				<!-- Menu Mobile caché -->
+				<div id="mobileMenu">
+					<div
+						class="close-menu-icon">
+						<!-- Icône de croix pour fermer le menu -->
+						<i class="fas fa-times"></i>
+					</div>
+					<a class="ref-nav" href="{{ path('app_default') }}">Page d'accueil</a>
+					<a class="ref-nav" href="{{ path('app_trick_index') }}">Tricks</a>
+					{% if app.user %}
+						<a class="ref-nav" href="{{ path('app_personal_index') }}">Page Perso</a>
+						<a class="ref-nav" href="{{ path('app_logout') }}">Deconnexion</a>
+					{% else %}
+						<a class="ref-nav" href="{{ path('app_login') }}">Connexion</a>
+						<a class="ref-nav" href="{{ path('app_register') }}">Enregistrement</a>
 					{% endif %}
 				</div>
 			</div>
 			{% block importmap %}
 				{{ importmap('app') }}
 			{% endblock %}
-		{% endblock %}
-		{% block body %}{% endblock %}
+			{% block body %}{% endblock %}
+			{% block javascripts %}{% endblock %}
 
-		<footer>
-			<p>@Copyright</p>
-		</footer>
-		<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-		<script src="./tricks.js"></script>
-	</body>
-</html>
+			<footer>
+				<p>@Copyright</p>
+			</footer>
+			<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+			<script src="./tricks.js"></script>
+		</body>
+	</html>

@@ -3,7 +3,7 @@
 		{% for trick in tricks %}
 			{% if number_tricks is not defined %}
 				{% if loop.index <= 6 %}
-					<div class="col-4 mt-3">
+					<div class="mt-3 col-md-4 ">
 
 						<a href="{{path("app_trick_show" , { "slug" : trick.slug } )}}">
 							<div class="trick-resume">
@@ -31,7 +31,7 @@
 				{% endif %}
 			{% else %}
 				{% if loop.index <= number_tricks %}
-					<div class="col-4 mt-3">
+					<div class="mt-3 col-md-4 ">
 						<a href="{{path("app_trick_show" ,{"slug" : trick.slug })}}">
 							<div class="trick-resume">
 								{% if trick.getFirstFile() is defined and trick.getFirstFile() != null %}

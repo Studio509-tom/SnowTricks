@@ -52,11 +52,13 @@
 	</div>
 </div>
 <a class="btn btn-light" href="{{ path('app_trick_index') }}">Retour à la liste</a>
-{% if is_granted("ROLE_ADMIN") or trick.getUser().getId() == app.user.id %}
-	<a class="btn btn-light edit-trick" href="{{ path('app_ajax_trick_edit', {'id': trick.id}) }}">
-		<i class="fas fa-pencil"></i>
-	</a>
-	<a class="btn btn-light delete-pop-up" href="{{ path('app_ajax_trick_delete', {'id': trick.id}) }}">
-		<i class="fas fa-trash-can"></i>
-	</a>
+{% if app.user.id is defined %}
+	{% if is_granted("ROLE_ADMIN") or trick.getUser().getId() == app.user.id %}
+		<a class="btn btn-light edit-trick" href="{{ path('app_ajax_trick_edit', {'id': trick.id}) }}">
+			<i class="fas fa-pencil"></i>
+		</a>
+		<a class="btn btn-light delete-pop-up" href="{{ path('app_ajax_trick_delete', {'id': trick.id}) }}">
+			<i class="fas fa-trash-can"></i>
+		</a>
+	{% endif %}
 {% endif %}

@@ -11,6 +11,18 @@ import './jquery-ui.theme.min.css';
  */
 import './styles/app.css';
 
+if (window.innerWidth < 768) {
+    $('.nav-element').remove();
+
+    $(document).on('click' , '.mobile-menu-icon' , function() {
+        $('#mobileMenu').animate({ left: '0' }, 300);
+    });
+
+    $(document).on('click' , '.close-menu-icon' , function() {
+        $('#mobileMenu').animate({ left: '-100%' }, 300);
+    });
+}
+
 // Tableau pour stocker les fichiers sélectionnés
 var selectedFiles = [];
 var deletedFiles = [];
