@@ -20,10 +20,11 @@
 <button class="btn btn-light add-links">Ajouter un lien</button>
 <div id="image-preview-existing">
 	{% if trick %}
-		{% if trick.files is not empty %}
-			{% for file in trick.files %}
-				{% if first_file_defined is not null %}
-					<p>image mise en avant :
+		<p>image mise en avant :
+			{% if trick.files is not empty %}
+				{% for file in trick.files %}
+					{% if first_file_defined is not null and loop.index == 1 %}
+
 					</p>
 					<div class="preview">
 						<div class="img-wrap">
@@ -45,8 +46,7 @@
 			{% endfor %}
 		{% else %}
 			{% if first_file_defined is not null %}
-				<p>image mise en avant :
-				</p>
+				
 				<div class="preview">
 					<div class="img-wrap">
 						<span class="close-file">&times;</span>

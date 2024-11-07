@@ -177,6 +177,7 @@ final class TrickAjax extends AbstractController
       $form = $this->createForm(TrickType::class, $trick);
       $form->handleRequest($request);
       $link_referer = $request->headers->get('referer');
+      // Récupération du paramètre d'URl
       $refererPathInfo = Request::create($link_referer)->getPathInfo();
       $refererPathInfo = str_replace($request->getScriptName(), '', $refererPathInfo);
       $filesystem = new Filesystem();
@@ -185,14 +186,20 @@ final class TrickAjax extends AbstractController
 
       if ($form->isSubmitted() && $form->isValid()) {
          // Vérification que le nom n'est pas déjà enregistrer
+         // ***************************************************************
+         // ***************         GOOD        ***************************
+         // ***************************************************************
          $title_trick = $trick->getTitle();
+
          $occurence_title = $trickRepository->findByTitle($title_trick);
+
          $enter = false;
          foreach ($occurence_title as $occurence) {
             if ($trick->getId() == $occurence->getId()) {
                $enter = true;
             }
          }
+
          // Si l'occurence trouvé n'est pas vide et que ils n'ont pas le même id
          if (!empty($occurence_title) && !$enter) {
             $this->addFlash('error', 'Le titre de cette article est déjà utilisé.');
@@ -209,25 +216,29 @@ final class TrickAjax extends AbstractController
          }
 
          $path = $this->imageLocation . 'tricks\\' . $trick->getId();
+         // n'est pas null quand l'image viens d'être rentré et est coché comme mise en Avant
          $primaryImage = $request->files->get('primary_image');
          // Si l'images n'est pas envoyer sous format images mais text (qu'elle est déjà enregistré)
          if (is_null($primaryImage)) {
             $primaryImage = $request->request->get('primary_image');
+            // Si aucune image est défini comme mise en Avant 
             if (!is_null($primaryImage)) {
                $hash_first_file = hash('sha256', $primaryImage);
-
                // Si l'image est retrouvé dans le dossier
                if ($filesystem->exists($path . '\\' . $primaryImage)) {
                   $first_file_arr = $trick->getFirstFile();
-                  // Si ce n'est pas l'image déjà mis en avant
-                  if ($primaryImage !== $first_file_arr[0]) {
-                     unset($existingFiles[array_search($primaryImage, $existingFiles)]);
-                     $existingFiles[] = $first_file_arr[0];
+                  if (!empty($first_file_arr)) {
+                     // Si ce n'est pas l'image déjà mis en avant
+                     if ($primaryImage !== $first_file_arr[0]) {
+                        unset($existingFiles[array_search($primaryImage, $existingFiles)]);
+                        $existingFiles[] = $first_file_arr[0];
+                        $trick->setFirstFile([$primaryImage]);
+                     }
+                  } else if (empty($first_file_arr)) {
                      $trick->setFirstFile([$primaryImage]);
                   }
                }
             } else {
-               var_dump("La fdp" );
                $trick->setFirstFile(NULL);
             }
          } else {
@@ -239,16 +250,22 @@ final class TrickAjax extends AbstractController
          }
          // Récupération des images envoyées via le formulaire 
          $images = $form->get('files')->getData();
-         // Récupération des fichiers existants dans l'entité Trick
+         // ***************************************************************
+         // ***************************************************************
+         // ***************************************************************
 
+         // Récupération des fichiers existants dans l'entité Trick
+         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+         // !!!!!!!!!!!!!!!!!!!!!!!!!!   A FAIRE PLUS TARD     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
          // Récupération des liens du formulaires
          if (isset($request->get('trick')['links'])) {
             $links = $request->get('trick')['links'];
          } else {
             $links = [];
          }
-
          $existingLinks = $trick->getLinks();
+
          // Récupération des fichiers que l'utilisateur souhaite supprimer
          $deletedFiles = json_decode($request->get('deleted_files', [])); // Tableau des fichiers à supprimer
 
@@ -266,14 +283,19 @@ final class TrickAjax extends AbstractController
                }
             }
          }
-
          date_default_timezone_set('Europe/Paris');
          $date_modify = new \DateTime(date('Y-m-d H:i:s'));
          $trick->setDateModify($date_modify);
+         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
          $files_entity = [];
-         // Gestion des ajouts de nouvelles images
+
+         // Si ajouts de nouvelles images
          if ($images) {
             // Vérifier si le dossier est vide ou innexistant
+
             if ((count(glob("$path/*")) === 0)) {
                rmdir($path);
                mkdir($path);
@@ -282,31 +304,35 @@ final class TrickAjax extends AbstractController
                // Scanner les fichiers déjà présents dans le répertoire
                $existingFilesInFolder = scandir($path);
             }
-            var_dump($images);
             foreach ($images as $image) {
                // Traitement du nom de l'image
                $originalFilename = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
                $safeFilename = $slugger->slug($originalFilename);
                $newFilename = $safeFilename . '-' . uniqid() . '.' . $image->guessExtension();
+               $hash_file = hash('sha256', $image);
 
-               $hash_file = hash('sha256', $imageContent);
                if (!in_array($newFilename, $existingFiles) && !in_array($newFilename, $existingFilesInFolder)) {
                   // Vérifier si l'image défini comme mise en avant et l'image traiter ne sont pas identique 
-                  var_dump($hash_file != $hash_first_file );
-                  if ($hash_file != $hash_first_file ) {
-                     $files_entity[] = $newFilename;
+                  var_dump(isset($hash_first_file));
+                  if (isset($hash_first_file)) {
+                     if ($hash_file != $hash_first_file) {
+                        $files_entity[] = $newFilename;
+                        $trick->setFiles($files_entity);
+                     } else {
+                        $new_first_file = [$newFilename];
+                        $trick->setFirstFile($new_first_file);
+                        die;
+                     }
                   } else {
-                     $new_first_file = [$newFilename];
-                     $trick->setFirstFile($new_first_file);
+                     var_dump($newFilename);
+                     $files_entity[] = $newFilename;
+                     $trick->setFiles($files_entity);
                   }
                   // Stockage de l'image
                   $image->move($path, $newFilename);
                }
             }
          }
-
-         $trick->setFiles($files_entity);
-         die;
          // Boucler sur les lien récupéré du formulaire
          foreach ($links as $link) {
             // Si pas vide
@@ -327,15 +353,17 @@ final class TrickAjax extends AbstractController
          }
          // Enregistrement des liens
          $trick->setLinks(array_values($existingLinks));
-         if (is_null($existingFiles)) {
-            $existingFiles = [];
+         if (!is_null($existingFiles)) {
+            foreach ($existingFiles as $key => $value) {
+               $files_entity[] = $value;
+            }
          }
-         // Mise à jour de l'entité Trick avec les fichiers actualisés
-         $trick->setFiles(array_values($existingFiles));
-
+         // // Mise à jour de l'entité Trick avec les fichiers actualisés
+         $trick->setFiles($files_entity);
          $title_trick = $trick->getTitle();
          $slug = $this->slugify($title_trick);
          $trick->setSlug($slug);
+         $entityManager->persist($trick);
          $entityManager->flush();
          $first_file = $trick->getFirstFile();
          // Si on est sur la page des tricks
