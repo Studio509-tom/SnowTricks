@@ -219,6 +219,7 @@ final class TrickAjax extends AbstractController
          // n'est pas null quand l'image viens d'être rentré et est coché comme mise en Avant
          $primaryImage = $request->files->get('primary_image');
          // Si l'images n'est pas envoyer sous format images mais text (qu'elle est déjà enregistré)
+         
          if (is_null($primaryImage)) {
             $primaryImage = $request->request->get('primary_image');
             // Si aucune image est défini comme mise en Avant 
@@ -232,9 +233,11 @@ final class TrickAjax extends AbstractController
                      if ($primaryImage !== $first_file_arr[0]) {
                         unset($existingFiles[array_search($primaryImage, $existingFiles)]);
                         $existingFiles[] = $first_file_arr[0];
+                        
                         $trick->setFirstFile([$primaryImage]);
                      }
                   } else if (empty($first_file_arr)) {
+                    
                      $trick->setFirstFile([$primaryImage]);
                   }
                }
@@ -242,11 +245,15 @@ final class TrickAjax extends AbstractController
                $trick->setFirstFile(NULL);
             }
          } else {
+           
             // pour traiter l'image principale 
-            $newFilename = uniqid() . '.' . $primaryImage->guessExtension();
+            $originalFilename = pathinfo($primaryImage->getClientOriginalName(), PATHINFO_FILENAME);
+            $safeFilename = $slugger->slug($originalFilename);
+            $newFilename = $safeFilename . '-' . uniqid() . '.' . $primaryImage->guessExtension();
             $imageContent = file_get_contents($primaryImage->getPathname());
             // Hashage pour supprimer le doublon lors de l'enregistrement plus bas
             $hash_first_file = hash('sha256', $imageContent);
+
          }
          // Récupération des images envoyées via le formulaire 
          $images = $form->get('files')->getData();
@@ -306,14 +313,15 @@ final class TrickAjax extends AbstractController
             }
             foreach ($images as $image) {
                // Traitement du nom de l'image
+               
                $originalFilename = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
                $safeFilename = $slugger->slug($originalFilename);
                $newFilename = $safeFilename . '-' . uniqid() . '.' . $image->guessExtension();
-               $hash_file = hash('sha256', $image);
+               $imageContent = file_get_contents($image->getPathname());
+               $hash_file = hash('sha256', $imageContent);
 
                if (!in_array($newFilename, $existingFiles) && !in_array($newFilename, $existingFilesInFolder)) {
                   // Vérifier si l'image défini comme mise en avant et l'image traiter ne sont pas identique 
-                  var_dump(isset($hash_first_file));
                   if (isset($hash_first_file)) {
                      if ($hash_file != $hash_first_file) {
                         $files_entity[] = $newFilename;
@@ -321,10 +329,8 @@ final class TrickAjax extends AbstractController
                      } else {
                         $new_first_file = [$newFilename];
                         $trick->setFirstFile($new_first_file);
-                        die;
                      }
                   } else {
-                     var_dump($newFilename);
                      $files_entity[] = $newFilename;
                      $trick->setFiles($files_entity);
                   }
@@ -358,7 +364,7 @@ final class TrickAjax extends AbstractController
                $files_entity[] = $value;
             }
          }
-         // // Mise à jour de l'entité Trick avec les fichiers actualisés
+         // Mise à jour de l'entité Trick avec les fichiers actualisés
          $trick->setFiles($files_entity);
          $title_trick = $trick->getTitle();
          $slug = $this->slugify($title_trick);
