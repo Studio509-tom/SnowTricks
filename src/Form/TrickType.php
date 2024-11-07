@@ -70,8 +70,8 @@ class TrickType extends AbstractType
                 'prototype' => true,
                 'by_reference' => false,
                 'required' => false,
-                
-                
+
+
             ]);
     }
 

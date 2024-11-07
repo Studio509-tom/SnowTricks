@@ -74,6 +74,7 @@ final class TrickController extends AbstractController
         $date_modify = $trick->getDateModify();
         $date_create = $trick->getDateCreate();
         $first_file = $trick->getFirstFile();
+        
         return $this->render('trick/show.html.twig', [
             'trick' => $trick,
             'comments' => $comments,
@@ -82,7 +83,7 @@ final class TrickController extends AbstractController
             "modify" => FALSE,
             'date_modify' => $date_modify,
             'date_create' => $date_create,
-            'first_file_defined' => is_null($trick->getFirstFile()) ? true : false,
+            'first_file_defined' => is_null($trick->getFirstFile()) ? null : true,
             'first_file' => is_null($first_file) || empty($first_file) ? null : $first_file[0],
 
         ]);

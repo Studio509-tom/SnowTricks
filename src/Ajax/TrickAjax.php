@@ -21,8 +21,8 @@ use Symfony\Component\Routing\RouterInterface;
 #[Route('/ajax/trick')]
 final class TrickAjax extends AbstractController
 {
-   private $filesDirectory, $imageLocation; 
-   function __construct(RequestStack $requestStack , $filesDirectory)
+   private $filesDirectory, $imageLocation;
+   function __construct(RequestStack $requestStack, $filesDirectory)
    {
       $this->imageLocation = $filesDirectory;
       if (!$requestStack->getCurrentRequest()->isXmlHttpRequest()) {
@@ -213,19 +213,22 @@ final class TrickAjax extends AbstractController
          // Si l'images n'est pas envoyer sous format images mais text (qu'elle est déjà enregistré)
          if (is_null($primaryImage)) {
             $primaryImage = $request->request->get('primary_image');
-            // Si l'image est retrouvé dans le dossier
-            if ($filesystem->exists($path . '\\' . $primaryImage)) {
-               $first_file_arr = $trick->getFirstFile();
-               // Si ce n'est pas l'image déjà mis en avant
-               if (!is_null($primaryImage)) {
+            if (!is_null($primaryImage)) {
+               $hash_first_file = hash('sha256', $primaryImage);
+
+               // Si l'image est retrouvé dans le dossier
+               if ($filesystem->exists($path . '\\' . $primaryImage)) {
+                  $first_file_arr = $trick->getFirstFile();
+                  // Si ce n'est pas l'image déjà mis en avant
                   if ($primaryImage !== $first_file_arr[0]) {
                      unset($existingFiles[array_search($primaryImage, $existingFiles)]);
                      $existingFiles[] = $first_file_arr[0];
                      $trick->setFirstFile([$primaryImage]);
                   }
-               } else {
-                  $trick->setFirstFile(NULL);
                }
+            } else {
+               var_dump("La fdp" );
+               $trick->setFirstFile(NULL);
             }
          } else {
             // pour traiter l'image principale 
@@ -267,7 +270,7 @@ final class TrickAjax extends AbstractController
          date_default_timezone_set('Europe/Paris');
          $date_modify = new \DateTime(date('Y-m-d H:i:s'));
          $trick->setDateModify($date_modify);
-
+         $files_entity = [];
          // Gestion des ajouts de nouvelles images
          if ($images) {
             // Vérifier si le dossier est vide ou innexistant
@@ -279,7 +282,7 @@ final class TrickAjax extends AbstractController
                // Scanner les fichiers déjà présents dans le répertoire
                $existingFilesInFolder = scandir($path);
             }
-
+            var_dump($images);
             foreach ($images as $image) {
                // Traitement du nom de l'image
                $originalFilename = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
@@ -288,18 +291,22 @@ final class TrickAjax extends AbstractController
 
                $hash_file = hash('sha256', $imageContent);
                if (!in_array($newFilename, $existingFiles) && !in_array($newFilename, $existingFilesInFolder)) {
-                  // Vérifier si l'image défini comme mise en avant et l'image traiter ne sont pas identique            
-                  if ($hash_file != $hash_first_file) {
+                  // Vérifier si l'image défini comme mise en avant et l'image traiter ne sont pas identique 
+                  var_dump($hash_file != $hash_first_file );
+                  if ($hash_file != $hash_first_file ) {
                      $files_entity[] = $newFilename;
-                     $trick->setFiles($files_entity);
                   } else {
-                     $trick->setFirstFile([$newFilename]);
+                     $new_first_file = [$newFilename];
+                     $trick->setFirstFile($new_first_file);
                   }
                   // Stockage de l'image
                   $image->move($path, $newFilename);
                }
             }
          }
+
+         $trick->setFiles($files_entity);
+         die;
          // Boucler sur les lien récupéré du formulaire
          foreach ($links as $link) {
             // Si pas vide
@@ -389,9 +396,9 @@ final class TrickAjax extends AbstractController
          $link_referer = $request->headers->get('referer');
          $refererPathInfo = Request::create($link_referer)->getPathInfo();
          $refererPathInfo = str_replace($request->getScriptName(), '', $refererPathInfo);
-        
+
          if ($refererPathInfo == ('/trick/' . $slug)) {
-            
+
             return new JsonResponse(['url_redirect' => $this->generateUrl('app_trick_index'), "redirection" => TRUE]);
          }
          $tricks_html = $this->render('trick/tricks-partial.html.twig', [

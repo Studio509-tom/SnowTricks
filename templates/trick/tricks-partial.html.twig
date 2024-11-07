@@ -15,7 +15,24 @@
 			<div class="mt-3 col-md-4 ">
 				<a href="{{path("app_trick_show" , { "slug" : trick.slug } )}}">
 					<div class="trick-resume">
-						<img class="picture-multiple-trick" src="{{asset('files/defaults/no-picture.jpg')}}" alt="no picture">
+						<pre>
+					</pre>
+						{% if trick.getFirstFile != null %}
+						{% for file in trick.getFirstFile %}
+							<img class="picture-multiple-trick" src="{{asset('files/tricks/' ~ trick.id ~ "/" ~ file )}}" alt="no picture">
+							
+						{% endfor %}
+
+						{% elseif trick.getFiles != null %}
+							{% for file in trick.getFiles %}
+								{% if loop.first %}
+									<img class="picture-multiple-trick" src="{{asset('files/tricks/' ~ trick.id ~ "/" ~ file )}}" alt="no picture">
+								{% endif %}
+							{% endfor %}
+
+						{% else %}
+							<img class="picture-multiple-trick" src="{{asset('files/defaults/no-picture.jpg')}}" alt="no picture">
+						{% endif %}
 						<p class="title">{{trick.title}}</p>
 						{% if app.user.id is defined %}
 							{% if is_granted("ROLE_ADMIN") or trick.getUser().getId() == app.user.id %}
