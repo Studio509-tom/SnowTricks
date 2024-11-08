@@ -293,9 +293,28 @@ footer {
 .btn-change-password{
     text-align: center !important;
 }
+@media (max-width: 1080px) {
+
+
+   
+    .form-login{
+        width: 70%;
+    }
+    .form-registration{
+        width: 70%;
+    }
+    .comment{
+        width: 90%;
+        margin: auto;   
+    }
+    .file-slogan{
+        background-position-y : 0;
+    }
+}
+
 @media (max-width: 768px) {
-    /* Afficher l'icône du menu mobile et masquer le menu desktop */
-    .mobile-menu-icon {
+     /* Afficher l'icône du menu mobile et masquer le menu desktop */
+     .mobile-menu-icon {
         display: block;
         border: none;
         background: none;
@@ -318,18 +337,5 @@ footer {
         position: absolute;
         top: 20px;
         right: 20px;
-    }
-    .form-login{
-        width: 70%;
-    }
-    .form-registration{
-        width: 70%;
-    }
-    .comment{
-        width: 90%;
-        margin: auto;   
-    }
-    .file-slogan{
-        background-position-y : 0;
     }
 }

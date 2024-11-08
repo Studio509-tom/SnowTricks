@@ -271,7 +271,7 @@ $(document).on('change' , '#profile-picture-form' , function(){
     })
 })
 
-// Afficher les images séléctionner lors de la créeation de l'article
+// Afficher les images séléctionner lors de la création de l'article
 $(document).on('change' , '#trick_files' , function(event){
     // Récupérer les fichiers sélectionnés
     let files = event.target.files;
@@ -280,7 +280,7 @@ $(document).on('change' , '#trick_files' , function(event){
      selectedFiles.push(files[i]);
     }
     var preview = $('#image-preview');
-    var div_preview = $('<div class="preview"></div>');
+    var div_preview = $('<div class="img-wrap"><span class="close-file">&times;</span><div class="preview"></div></div>');
 
     for (let i = 0; i < files.length; i++) {
         var file = files[i];

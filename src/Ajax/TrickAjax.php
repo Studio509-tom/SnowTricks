@@ -186,9 +186,6 @@ final class TrickAjax extends AbstractController
 
       if ($form->isSubmitted() && $form->isValid()) {
          // Vérification que le nom n'est pas déjà enregistrer
-         // ***************************************************************
-         // ***************         GOOD        ***************************
-         // ***************************************************************
          $title_trick = $trick->getTitle();
 
          $occurence_title = $trickRepository->findByTitle($title_trick);
@@ -257,9 +254,6 @@ final class TrickAjax extends AbstractController
          }
          // Récupération des images envoyées via le formulaire 
          $images = $form->get('files')->getData();
-         // ***************************************************************
-         // ***************************************************************
-         // ***************************************************************
 
          // Récupération des fichiers existants dans l'entité Trick
          // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
