@@ -37,6 +37,7 @@ Remarque : Assurez-vous de remplacer user, password, 127.0.0.1, 3306 et nom_de_l
 Pour créer la base de données et appliquer les migrations :
 
 > php bin/console doctrine:database:create
+
 > php bin/console doctrine:migrations:migrate
 
 ### 5. Charger des données de démonstration (fixtures)
