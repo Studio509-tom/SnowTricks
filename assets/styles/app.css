@@ -71,6 +71,7 @@ a{
 
 .picture-multiple-trick{
     width: 100%;
+    height: 350px;
 }
 .title-section{
     margin: 50px;
@@ -337,5 +338,8 @@ footer {
         position: absolute;
         top: 20px;
         right: 20px;
+    }
+    .first-file img {
+        width: 90%;
     }
 }
