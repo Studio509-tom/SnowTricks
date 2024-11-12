@@ -20,7 +20,7 @@ Clonez le dépôt GitHub sur votre machine locale :
 ### 2. Installer les dépendances PHP
 Assurez-vous d'avoir installé Composer, puis installez les dépendances :
 
-composer install
+> composer install
 
 ### 3. Configurer les variables d'environnement
 Copiez le fichier .env pour créer un fichier .env.local que vous allez modifier avec vos configurations locales :
