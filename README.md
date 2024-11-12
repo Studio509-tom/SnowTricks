@@ -47,3 +47,5 @@ php bin/console doctrine:fixtures:load
 Vous pouvez maintenant lancer le serveur Symfony :
 
 symfony server:start
+
+L'application devrait être accessible à l'adresse suivante : http://localhost:8000.
