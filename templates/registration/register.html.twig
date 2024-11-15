@@ -7,7 +7,11 @@
 	<div class="container">
 		<div class="row">
 			<div class="col-12 mt-5">
-
+				{% for message in app.flashes('error') %}
+					<div class="alert alert-warning">
+						{{ message }}
+					</div>
+				{% endfor %}
 				{{ form_errors(registrationForm ) }}
 
 				{{ form_start(registrationForm, {'attr': {'class': 'form-registration '}}) }}
@@ -20,7 +24,7 @@
 
 				<label for="{{ field_name(registrationForm.lastname) }}">Nom</label>
 				<input name="{{ field_name(registrationForm.lastname) }}" class="form-control">
-				
+
 				<label for="{{ field_name(registrationForm.firstname) }}">Prénom</label>
 				<input name="{{ field_name(registrationForm.firstname) }}" class="form-control">
 

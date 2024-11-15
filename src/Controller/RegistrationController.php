@@ -15,26 +15,30 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
-
+use App\Repository\UserRepository;
 class RegistrationController extends AbstractController
 {
    public function __construct(private EmailVerifier $emailVerifier) {}
 
    #[Route('/register', name: 'app_register')]
-   public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager): Response
+   public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager , UserRepository $userRepository): Response
    {
       $user = new User();
       $form = $this->createForm(RegistrationFormType::class, $user);
 
       $form->handleRequest($request);
-
+      // var_dump($form->isSubmitted());
+      // var_dump($form->isValid());
+      // if($userRepository->findBy(['email' => $form->get('email')])){
+      //    echo 'test';
+      //    die;
+      // }
       if ($form->isSubmitted() && $form->isValid()) {
          /** @var string $plainPassword */
          $plainPassword = $form->get('plainPassword')->getData();
 
          // encode the plain password
          $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
-
          $entityManager->persist($user);
          $entityManager->flush();
 
@@ -53,7 +57,10 @@ class RegistrationController extends AbstractController
 
          return $this->redirectToRoute('app_default');
       }
-
+      // var_dump($form->get('email'));
+      if(!is_null($form->get('email'))){
+         $this->addFlash('error' , "l'Email est déjà utilisé");
+      }
       return $this->render('registration/register.html.twig', [
          'registrationForm' => $form,
       ]);

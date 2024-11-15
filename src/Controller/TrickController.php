@@ -27,29 +27,6 @@ final class TrickController extends AbstractController
         ]);
     }
 
-    // #[Route('/new', name: 'app_trick_new', methods: ['GET', 'POST'])]
-    // public function new(Request $request, EntityManagerInterface $entityManager): Response
-    // {
-    //     $trick = new Trick();
-    //     $form = $this->createForm(TrickType::class, $trick);
-    //     $form->handleRequest($request);
-
-
-    //     if ($form->isSubmitted() && $form->isValid()) {
-    //         $entityManager->persist($trick);
-    //         $entityManager->flush();
-
-    //         return $this->redirectToRoute('app_trick_index', [], Response::HTTP_SEE_OTHER);
-    //     }
-
-    //     return $this->render('trick/new.html.twig', [
-    //         'trick' => $trick,
-    //         'form' => $form,
-
-
-    //     ]);
-    // }
-
     #[Route('/{slug}', name: 'app_trick_show', methods: ['GET'])]
     /** @param Trick $trick **/
     public function show(Trick $trick, TrickRepository $trickRepository,  CommentRepository $commentRepository, UserRepository $userRepository): Response
@@ -88,24 +65,6 @@ final class TrickController extends AbstractController
 
         ]);
     }
-
-    // #[Route('/{id}/edit', name: 'app_trick_edit', methods: ['GET', 'POST'])]
-    // public function edit(Request $request, Trick $trick, EntityManagerInterface $entityManager): Response
-    // {
-    //     $form = $this->createForm(TrickType::class, $trick);
-    //     $form->handleRequest($request);
-
-    //     if ($form->isSubmitted() && $form->isValid()) {
-    //         $entityManager->flush();
-
-    //         return $this->redirectToRoute('app_trick_index', [], Response::HTTP_SEE_OTHER);
-    //     }
-
-    //     return $this->render('trick/edit.html.twig', [
-    //         'trick' => $trick,
-    //         'form' => $form,
-    //     ]);
-    // }
 
     #[Route('/{id}', name: 'app_trick_delete', methods: ['POST'])]
     public function delete(Request $request, Trick $trick, EntityManagerInterface $entityManager): Response

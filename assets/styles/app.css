@@ -296,7 +296,9 @@ footer {
 }
 @media (max-width: 1080px) {
 
-
+    .first-file img {
+        width: 90%;
+    }
    
     .form-login{
         width: 70%;
