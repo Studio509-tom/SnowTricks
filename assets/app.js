@@ -179,7 +179,8 @@ $(document).on('click' , '.delete-pop-up' , function(e){
         data : {id_trick},
         success: function(reponse){
             console.log(reponse)
-            $('<div id="dialog-confirm"></div>').html(reponse.confirm_delete).dialog();
+            let html = '<div id="dialog-confirm"></div>';
+            $(html).html(reponse.confirm_delete).dialog();
         }
     });
 })
@@ -304,7 +305,6 @@ $(document).on('change' , '#trick_files' , function(event){
 $(document).on('click' , '.close-file' , function(){
     let parent_this = $(this).parent();
     let file_delete = parent_this.children('.file-upload').data('filename');
-    let img_element = parent_this.children('img');
     deletedFiles.push(file_delete);
     parent_this.remove()
 })
@@ -317,7 +317,7 @@ $(document).on('click' , '.add-links' , function(e){
     $('.parent-links').append(link_wrap);
 })
 
-$(document).on('click', '.close-link' ,function(e){
+$(document).on('click', '.close-link' ,function(){
     let parent_this = $(this).parent();
     parent_this.remove();
 })
