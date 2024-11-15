@@ -31,7 +31,7 @@ final class CommentAjax extends AbstractController
     }
 
     #[Route('/new/{trick}', name: 'app_ajax_comment_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, Trick $trick, EntityManagerInterface $entityManager, ManagerRegistry $doctrine, CommentRepository $commentRepository, UserRepository $userRepository): Response
+    public function new(Request $request, Trick $trick, EntityManagerInterface $entityManager, CommentRepository $commentRepository, UserRepository $userRepository): Response
     {
         $comment = new Comment();
         // Associer le commentaire à l'entité User
@@ -82,7 +82,7 @@ final class CommentAjax extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_ajax_comment_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Comment $comment, ManagerRegistry $doctrine, EntityManagerInterface $entityManager, CommentRepository $commentRepository, UserRepository $userRepository): Response
+    public function edit(Request $request, Comment $comment, ManagerRegistry $managerRegistry, EntityManagerInterface $entityManager, CommentRepository $commentRepository, UserRepository $userRepository): Response
     {
         // Récupération de tous les commentaires
 
@@ -107,7 +107,7 @@ final class CommentAjax extends AbstractController
             // Récupérer l'ID du Trick à partir du champ caché
             $trickId = $trick->getId();
             // Récupérer l'entité Trick correspondante 
-            $trick = $doctrine->getRepository(Trick::class)->find($trickId);
+            $trick = $managerRegistry->getRepository(Trick::class)->find($trickId);
             $entityManager->flush();
             // Récupérer les commentaires actualisés
             $comments = $commentRepository->findBy(['trick' => $trick->getId()], array('id' => 'DESC'));
