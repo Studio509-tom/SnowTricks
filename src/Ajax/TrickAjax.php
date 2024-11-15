@@ -173,7 +173,7 @@ final class TrickAjax extends AbstractController
 
    #[IsGranted('ROLE_USER')]
    #[Route('/{id}/edit', name: 'app_ajax_trick_edit', methods: ['GET', 'POST'])]
-   public function edit(Request $request, Trick $trick, EntityManagerInterface $entityManager, TrickRepository $trickRepository, SluggerInterface $slugger, RouterInterface $router): Response
+   public function edit(Request $request, Trick $trick, EntityManagerInterface $entityManager, TrickRepository $trickRepository, SluggerInterface $slugger): Response
    {
       $form = $this->createForm(TrickType::class, $trick);
       $form->handleRequest($request);

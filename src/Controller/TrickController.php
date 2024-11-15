@@ -29,7 +29,7 @@ final class TrickController extends AbstractController
 
     #[Route('/{slug}', name: 'app_trick_show', methods: ['GET'])]
     /** @param Trick $trick **/
-    public function show(Trick $trick, TrickRepository $trickRepository,  CommentRepository $commentRepository, UserRepository $userRepository): Response
+    public function show(Trick $trick,  CommentRepository $commentRepository, UserRepository $userRepository): Response
     {
         $comment = new Comment();
         $comment->setTrick($trick);

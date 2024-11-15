@@ -178,9 +178,7 @@ $(document).on('click' , '.delete-pop-up' , function(e){
         url: url,
         data : {id_trick},
         success: function(reponse){
-            console.log(reponse)
-            let html = '<div id="dialog-confirm"></div>';
-            $(html).html(reponse.confirm_delete).dialog();
+            $('<div id="dialog-confirm"></div>').html(reponse.confirm_delete).dialog();
         }
     });
 })
