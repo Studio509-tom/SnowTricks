@@ -16,7 +16,7 @@ class AppFixtures extends Fixture
     private $tricksDirectory, $imageLocation;
     private $defaultDirectory, $defaultsDirectory;
 
-    public function __construct(UserPasswordHasherInterface $passwordHasher, UserRepository $userRepository ,$tricksDirectory , $defaultsDirectory)
+    public function __construct(UserPasswordHasherInterface $passwordHasher, UserRepository $userRepository ,string $tricksDirectory ,string  $defaultsDirectory)
     {
         $this->passwordHasher = $passwordHasher;
         $this->userRepository = $userRepository;
@@ -153,7 +153,7 @@ class AppFixtures extends Fixture
         return $trick;
     }
 
-    function slugify($text)
+    function slugify(string $text): string
     {
         // Remplacer les accents par leur équivalent ASCII
         $text = iconv('UTF-8', 'ASCII//TRANSLIT', $text);
