@@ -444,7 +444,7 @@ final class TrickAjax extends AbstractController
       return new JsonResponse(['confirm_delete' => $delete_confirm_html->getContent()]);
    }
 
-   function slugify($text): string
+   function slugify(string $text): string
    {
       // Remplacer les accents par leur équivalent ASCII
       $text = iconv('UTF-8', 'ASCII//TRANSLIT', $text);
