@@ -31,7 +31,7 @@ final class CommentAjax extends AbstractController
     }
 
     #[Route('/new/{trick}', name: 'app_ajax_comment_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, Trick $trick, EntityManagerInterface $entityManager, CommentRepository $commentRepository, UserRepository $userRepository): Response
+    public function new(Request $request, Trick $trick, EntityManagerInterface $entityManager, ManagerRegistry $doctrine, CommentRepository $commentRepository, UserRepository $userRepository): Response
     {
         $comment = new Comment();
         // Associer le commentaire à l'entité User
