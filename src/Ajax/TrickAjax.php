@@ -22,7 +22,7 @@ use Symfony\Component\Routing\RouterInterface;
 final class TrickAjax extends AbstractController
 {
    private $filesDirectory, $imageLocation;
-   function __construct(RequestStack $requestStack, $filesDirectory)
+   function __construct(RequestStack $requestStack,string $filesDirectory)
    {
       $this->imageLocation = $filesDirectory;
       if (!$requestStack->getCurrentRequest()->isXmlHttpRequest()) {
@@ -125,7 +125,8 @@ final class TrickAjax extends AbstractController
 
             // Traitement si il n'y a pas eu d'image mis en avant
             if (!$image_empty) {
-               for ($i = 0; $i < count($files_entity); $i++) {
+               $length_files_entity = count($files_entity);
+               for ($i = 0; $i < $length_files_entity; $i++) {
                   $file =  $files_entity[$i];
                   $images[$i]->move($path, $file);
                }
@@ -443,7 +444,7 @@ final class TrickAjax extends AbstractController
       return new JsonResponse(['confirm_delete' => $delete_confirm_html->getContent()]);
    }
 
-   function slugify($text)
+   function slugify($text): string
    {
       // Remplacer les accents par leur équivalent ASCII
       $text = iconv('UTF-8', 'ASCII//TRANSLIT', $text);

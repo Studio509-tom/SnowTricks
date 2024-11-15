@@ -31,7 +31,6 @@ final class TrickController extends AbstractController
     /** @param Trick $trick **/
     public function show(Trick $trick, TrickRepository $trickRepository,  CommentRepository $commentRepository, UserRepository $userRepository): Response
     {
-        // $trick = $trickRepository->getTitileForUrl($slug);
         $comment = new Comment();
         $comment->setTrick($trick);
         $comments = $commentRepository->findBy(['trick' => $trick->getId()], array('id' => 'DESC'));
