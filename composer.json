@@ -83,11 +83,15 @@
             "importmap:install": "symfony-cmd"
         },
         "post-install-cmd": [
-            "@auto-scripts"
+            "Symfony\\Bridge\\Doctrine\\DoctrineBundle\\Composer\\ScriptHandler::clearCache",
+            "php bin/console assets:install --symlink"
         ],
         "post-update-cmd": [
-            "@auto-scripts"
+            "Symfony\\Bridge\\Doctrine\\DoctrineBundle\\Composer\\ScriptHandler::clearCache",
+            "php bin/console assets:install --symlink"
         ]
+       
+
     },
     "conflict": {
         "symfony/symfony": "*"
