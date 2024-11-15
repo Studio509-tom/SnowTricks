@@ -145,7 +145,8 @@ final class CommentAjax extends AbstractController
     #[Route('/{id}', name: 'app_ajax_comment_delete', methods: ['POST'])]
     public function delete(Request $request, Comment $comment, EntityManagerInterface $entityManager, CommentRepository $commentRepository, UserRepository $userRepository): Response
     {
-        if ($this->isCsrfTokenValid('delete' . $comment->getId(), $request->getPayload()->getString('_token'))) {
+        $id_comment =  $comment->getId();
+        if ($this->isCsrfTokenValid('delete' .$id_comment, $request->getPayload()->getString('_token'))) {
             // Supprimer l'entité
             $entityManager->remove($comment);
             $entityManager->flush();

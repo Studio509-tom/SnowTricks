@@ -415,8 +415,8 @@ final class TrickAjax extends AbstractController
    #[Route('/{id}', name: 'app_ajax_trick_delete', methods: ['POST'])]
    public function delete(Request $request, Trick $trick, EntityManagerInterface $entityManager, TrickRepository $trickRepository): Response
    {
-
-      if ($this->isCsrfTokenValid('delete' . $trick->getId(), $request->getPayload()->getString('_token'))) {
+      $trick_id = $trick->getId();
+      if ($this->isCsrfTokenValid('delete' . $trick_id, $request->getPayload()->getString('_token'))) {
          $slug = $trick->getSlug();
          $entityManager->remove($trick);
          $entityManager->flush();
