@@ -7,12 +7,11 @@
 			{% endblock %}
 		</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-		<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"> {% block stylesheets %}{% endblock %}
-
+		{% block stylesheets %}{% endblock %}
+		<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"> 
 
 		</head>
-		<body class="body">
+		<body class="body mb-5">
 			<div class="nav-bar">
 				<img
 				class="logo-element" src="{{ asset('files/defaults/logo-ST.png') }}" alt="logo">
@@ -63,9 +62,9 @@
 			{% block body %}{% endblock %}
 			{% block javascripts %}{% endblock %}
 
-			<footer>
+			{# <footer>
 				<p>@Copyright</p>
-			</footer>
+			</footer> #}
 			<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 			<script src="./tricks.js"></script>
 		</body>
