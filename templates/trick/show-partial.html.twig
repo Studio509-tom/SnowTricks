@@ -7,30 +7,32 @@
 					<img src="{{asset('files/tricks/' ~ trick.id ~ '/' ~ first_file )}}" alt="Image du trick">
 				</div>
 			{% endif %}
-			{% for file in trick.files %}
-				{% if loop.index == 1 and first_file_defined is null %}
-					<div class="first-file">
-						<img src="{{asset('files/tricks/' ~ trick.id ~ '/' ~ file )}}" alt="Image du trick">
-					</div>
-				{% endif %}
-			{% endfor %}
-			<div class="file-other">
+			<div class="row">
 				{% for file in trick.files %}
-					{% if loop.index >= 1 or first_file_defined is not null  %}
-						<img src="{{asset('files/tricks/' ~ trick.id ~ '/' ~ file )}}" alt="Image du trick">
+					{% if loop.index == 1 and first_file_defined is null %}
+						<div class="first-file">
+							<img src="{{asset('files/tricks/' ~ trick.id ~ '/' ~ file )}}" alt="Image du trick">
+						</div>
 					{% endif %}
 				{% endfor %}
-			</div>
-
-			{% if trick.links %}
-				{% for link in trick.links %}
-					<div class="video-container">
-						{% if 'youtube.com' in link %}
-							<iframe width="560" height="315" src="{{ link | replace({'watch?v=': 'embed/'}) }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-						{% endif %}
-					</div>
+				{% for file in trick.files %}
+					{% if loop.index >= 1 or first_file_defined is not null  %}
+						<div class="file-other  col-sm-6 col-md-4 col-lg-3 mt-3">
+							<img src="{{asset('files/tricks/' ~ trick.id ~ '/' ~ file )}}" alt="Image du trick">
+						</div>
+					{% endif %}
 				{% endfor %}
-			{% endif %}
+
+				{% if trick.links %}
+					{% for link in trick.links %}
+						<div class="video-container col-sm-6 col-md-4 col-lg-3 mt-3">
+							{% if 'youtube.com' in link %}
+								<iframe src="{{ link | replace({'watch?v=': 'embed/'}) }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+							{% endif %}
+						</div>
+					{% endfor %}
+				{% endif %}
+			</div>
 			<div class="content-trick">
 				<p class="content">
 					{{ trick.content }}

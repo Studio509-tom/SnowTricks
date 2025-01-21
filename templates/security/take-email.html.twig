@@ -7,9 +7,14 @@
 			{{ message }}
 		</div>
 	{% endfor %}
-	{{ form_start(form) }}
-
-	{{ form_row(form.email) }}
-	<button type="submit">Envoyer</button>
-	{{ form_end(form) }}
+<div class="container">
+	<div class="row">
+		<div class="col-6 mt-5 mx-auto" >
+		{{ form_start(form ,{ 'attr' :{'class' : 'form-group mx-auto' }}) }}
+		{{ form_row(form.email,{ 'attr' :{'class' : 'form-control mx-auto'}}) }}
+		<button type="submit" class="btn btn-primary mt-3" >Envoyer</button>
+		{{ form_end(form) }}
+		</div>
+	</div>
+</div>
 {% endblock %}

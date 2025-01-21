@@ -10,7 +10,7 @@ import './jquery-ui.theme.min.css';
  * which should already be in your base.html.twig.
  */
 import './styles/app.css';
-
+console.log(window.innerWidth)
 if (window.innerWidth < 768) {
     $('.nav-element').remove();
 

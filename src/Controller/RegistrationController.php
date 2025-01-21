@@ -25,18 +25,11 @@ class RegistrationController extends AbstractController
    {
       $user = new User();
       $form = $this->createForm(RegistrationFormType::class, $user);
-
       $form->handleRequest($request);
-      // var_dump($form->isSubmitted());
-      // var_dump($form->isValid());
-      // if($userRepository->findBy(['email' => $form->get('email')])){
-      //    echo 'test';
-      //    die;
-      // }
       if ($form->isSubmitted() && $form->isValid()) {
          /** @var string $plainPassword */
          $plainPassword = $form->get('plainPassword')->getData();
-
+         
          // encode the plain password
          $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
          $entityManager->persist($user);
@@ -49,17 +42,19 @@ class RegistrationController extends AbstractController
             (new TemplatedEmail())
                ->from(new Address('tom@studio509.fr', 'TomCorp'))
                ->to((string) $user->getEmail())
-               ->subject('Please Confirm your Email')
+               ->subject('Confirmer votre email')
                ->htmlTemplate('registration/confirmation_email.html.twig')
          );
 
          // do anything else you need here, like send an email
-
+        
          return $this->redirectToRoute('app_default');
       }
-      // var_dump($form->get('email'));
-      if(!is_null($form->get('email'))){
-         $this->addFlash('error' , "l'Email est déjà utilisé");
+      if(is_null($form->get('email')->getData())){
+         $this->addFlash('error' , "l'Email n'est pas renseigné");
+      }else{
+         $this->addFlash('error' , "l'Email existe déjà");
+
       }
       return $this->render('registration/register.html.twig', [
          'registrationForm' => $form,
