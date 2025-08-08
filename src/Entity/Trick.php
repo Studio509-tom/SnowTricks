@@ -36,7 +36,7 @@ class Trick
     /**
      * @var Collection<int, Comment>
      */
-    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'trick')]
+    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'trick', cascade: ['remove'])]
     private Collection $comments;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]

@@ -26,6 +26,7 @@ class RegistrationController extends AbstractController
       $user = new User();
       $form = $this->createForm(RegistrationFormType::class, $user);
       $form->handleRequest($request);
+      
       if ($form->isSubmitted() && $form->isValid()) {
          /** @var string $plainPassword */
          $plainPassword = $form->get('plainPassword')->getData();
@@ -35,27 +36,35 @@ class RegistrationController extends AbstractController
          $entityManager->persist($user);
          $entityManager->flush();
 
-         // generate a signed url and email it to the user
-         $this->emailVerifier->sendEmailConfirmation(
-            'app_verify_email',
-            $user,
-            (new TemplatedEmail())
-               ->from(new Address('tom@studio509.fr', 'TomCorp'))
-               ->to((string) $user->getEmail())
-               ->subject('Confirmer votre email')
-               ->htmlTemplate('registration/confirmation_email.html.twig')
-         );
+         try {
+            // generate a signed url and email it to the user
+            $this->emailVerifier->sendEmailConfirmation(
+               'app_verify_email',
+               $user,
+               (new TemplatedEmail())
+                  ->from(new Address('tom@studio509.fr', 'TomCorp'))
+                  ->to((string) $user->getEmail())
+                  ->subject('Confirmer votre email')
+                  ->htmlTemplate('registration/confirmation_email.html.twig')
+            );
+            
+            $this->addFlash('success', 'Inscription réussie ! Vérifiez votre email pour confirmer votre compte.');
+         } catch (\Exception $e) {
+            $this->addFlash('warning', 'Inscription réussie, mais l\'email de confirmation n\'a pas pu être envoyé. Vous pouvez vous connecter directement.');
+         }
 
-         // do anything else you need here, like send an email
-        
          return $this->redirectToRoute('app_default');
       }
-      if(is_null($form->get('email')->getData())){
-         $this->addFlash('error' , "l'Email n'est pas renseigné");
-      }else{
-         $this->addFlash('error' , "l'Email existe déjà");
-
+      
+      // Gérer les erreurs de validation uniquement si le formulaire a été soumis
+      if ($form->isSubmitted() && !$form->isValid()) {
+         if ($form->get('email')->getErrors()->count() > 0) {
+            $this->addFlash('error', "Erreur avec l'email : " . $form->get('email')->getErrors()[0]->getMessage());
+         } else {
+            $this->addFlash('error', "Veuillez corriger les erreurs dans le formulaire.");
+         }
       }
+      
       return $this->render('registration/register.html.twig', [
          'registrationForm' => $form,
       ]);

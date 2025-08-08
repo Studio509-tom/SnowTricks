@@ -9,14 +9,13 @@
 			{% endif %}
 			<div class="row">
 				{% for file in trick.files %}
-					{% if loop.index == 1 and first_file_defined is null %}
+					{% if loop.index == 1 and (first_file_defined is null or first_file_defined == false) and (trick.getFirstFile() is empty) %}
+						{# Premier fichier utilisé comme image principale seulement si aucune image principale n'est définie #}
 						<div class="first-file">
 							<img src="{{asset('files/tricks/' ~ trick.id ~ '/' ~ file )}}" alt="Image du trick">
 						</div>
-					{% endif %}
-				{% endfor %}
-				{% for file in trick.files %}
-					{% if loop.index >= 1 or first_file_defined is not null  %}
+					{% else %}
+						{# Tous les autres fichiers s'affichent normalement #}
 						<div class="file-other  col-sm-6 col-md-4 col-lg-3 mt-3">
 							<img src="{{asset('files/tricks/' ~ trick.id ~ '/' ~ file )}}" alt="Image du trick">
 						</div>

@@ -84,17 +84,20 @@ final class CommentAjax extends AbstractController
     #[Route('/{id}/edit', name: 'app_ajax_comment_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Comment $comment, ManagerRegistry $managerRegistry, EntityManagerInterface $entityManager, CommentRepository $commentRepository, UserRepository $userRepository): Response
     {
-        // Récupération de tous les commentaires
-
-        $form_comment = $this->createForm(CommentType::class, $comment);
-        $form_comment->handleRequest($request);
+        // Formulaire pour éditer le commentaire spécifique
+        $form_comment_edit = $this->createForm(CommentType::class, $comment);
+        $form_comment_edit->handleRequest($request);
+        
+        // Formulaire vide pour créer un nouveau commentaire
+        $new_comment = new Comment();
+        $new_comment->setUser($this->getUser());
+        $form_comment_new = $this->createForm(CommentType::class, $new_comment);
+        
         $users = $userRepository->findAll();
         $arr_users = [];
         $trick = $comment->getTrick();
-
         // Récupérer l'entité Trick correspondante 
         $comments = $commentRepository->findBy(['trick' => $trick->getId()], array('id' => 'DESC'));
-
         foreach ($comments as $com) {
             foreach ($users as $user) {
                 if ($user->getId() == $com->getUser()->getId()) {
@@ -103,7 +106,7 @@ final class CommentAjax extends AbstractController
             }
         }
 
-        if ($form_comment->isSubmitted() && $form_comment->isValid()) {
+        if ($form_comment_edit->isSubmitted() && $form_comment_edit->isValid()) {
             // Récupérer l'ID du Trick à partir du champ caché
             $trickId = $trick->getId();
             // Récupérer l'entité Trick correspondante 
@@ -116,7 +119,8 @@ final class CommentAjax extends AbstractController
                 'modify' => FALSE,
                 'comments' => $comments,
                 'users' =>  $arr_users,
-                'form_comment' => $form_comment->createView(),
+                'form_comment' => $form_comment_new->createView(), // Formulaire vide pour nouveaux commentaires
+                'trick' => $trick,
             ]);
 
             // Retourner une réponse JSON après la mise à jour
@@ -132,10 +136,11 @@ final class CommentAjax extends AbstractController
         // Rendu de la vue Twig avec le formulaire spécifique pour la modification
         $edit_html = $this->render('trick/comments.html.twig', [
             'comments' => $comments,
-            'form_comment' => $form_comment->createView(),  // Formulaire pour créer un nouveau commentaire
+            'form_comment' => $form_comment_new->createView(),  // Formulaire vide pour créer un nouveau commentaire
             'modify' => true,
             'forms' => $forms,
             'users' =>  $arr_users,
+            'trick' => $trick,  // Ajout de la variable trick manquante
             'id_comment' => $request->request->get('id_comment'),
         ]);
 

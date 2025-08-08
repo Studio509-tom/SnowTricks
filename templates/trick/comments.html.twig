@@ -1,4 +1,4 @@
-{% if is_granted("IS_AUTHENTICATED") %}
+{% if is_granted("IS_AUTHENTICATED") and trick is defined and not modify %}
 	{{ form_start(form_comment , { 'attr' : { 'class': 'form-comment' } }) }}
 	{{ form_widget(form_comment) }}
 	<button type="submit" class="submit-comment btn btn-light" name="send-comment" value="Envoyer" data-url="{{ path('app_ajax_comment_new', {'trick': trick.id})}}">Commenter</button>

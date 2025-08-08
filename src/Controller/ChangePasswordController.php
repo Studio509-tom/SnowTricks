@@ -93,11 +93,19 @@ class ChangePasswordController extends AbstractController
             $email_message = (new Email())
                 ->from(new Address('tom@studio509.fr', 'TomCorp'))
                 ->to((string) $user->getEmail())
-                ->subject("Confirmation de l'adresse email")
+                ->subject("Réinitialisation de votre mot de passe")
                 ->html('<p>Pour réinitialiser votre mot de passe, veuillez cliquer sur le lien suivant : <a href="' . $url .
                     '">Réinitialiser mon mot de passe</a></p>');
-            // Envoyer l'email
-            $mailer->send($email_message);
+            
+            // Envoyer l'email avec gestion d'erreur
+            try {
+                $mailer->send($email_message);
+                error_log("Email sent successfully");
+                $this->addFlash('success', 'Un email de réinitialisation a été envoyé à votre adresse.');
+            } catch (\Exception $e) {
+                error_log("Error sending email: " . $e->getMessage());
+                $this->addFlash('danger', 'Erreur lors de l\'envoi de l\'email. Veuillez réessayer.');
+            }
         }
 
         return  $this->render('security/take-email.html.twig', [

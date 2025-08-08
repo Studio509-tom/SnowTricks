@@ -62,9 +62,12 @@ final class TrickAjax extends AbstractController
                return new JsonResponse(['edit_html' => $create_html->getContent(), 'error' => true]);
             }
             $primaryImage = $request->files->get('primary_image');
+            $primaryImageFilename = null;
             if ($primaryImage) {
                // pour traiter l'image principale 
-               $newFilename = uniqid() . '.' . $primaryImage->guessExtension();
+               $originalFilename = pathinfo($primaryImage->getClientOriginalName(), PATHINFO_FILENAME);
+               $safeFilename = $slugger->slug($originalFilename);
+               $primaryImageFilename = $safeFilename . '-' . uniqid() . '.' . $primaryImage->guessExtension();
                $imageContent = file_get_contents($primaryImage->getPathname());
                // Hashage pour supprimer le doublon lors de l'enregistrement plus bas
                $hash_first_file = hash('sha256', $imageContent);
@@ -85,6 +88,7 @@ final class TrickAjax extends AbstractController
 
             $image_empty = TRUE;
             $files_entity = [];
+            $image_objects = []; // Pour stocker les objets images correspondants
             if ($images) {
                $image_empty = FALSE;
                foreach ($images as $image) {
@@ -95,13 +99,22 @@ final class TrickAjax extends AbstractController
                   $imageContent = file_get_contents($image->getPathname());
                   $hash_file = hash('sha256', $imageContent);
                   // Vérifier si l'image défini comme mise en avant et l'image traiter ne sont pas identique            
-                  if ($hash_file != $hash_first_file) {
-                     $files_entity[] = $newFilename;
-                     $trick->setFiles($files_entity);
+                  if (isset($hash_first_file) && $hash_file == $hash_first_file) {
+                     // Cette image est l'image principale, on utilise le nom généré pour l'image principale
+                     $trick->setFirstFile([$primaryImageFilename]);
                   } else {
-                     $trick->setFirstFile([$newFilename]);
+                     // Cette image va dans les fichiers normaux
+                     $files_entity[] = $newFilename;
+                     $image_objects[] = $image;
                   }
                }
+               // Définir tous les fichiers une seule fois en dehors de la boucle
+               $trick->setFiles($files_entity);
+            }
+            
+            // Si une image principale a été définie mais qu'elle n'était pas dans les images du formulaire
+            if ($primaryImageFilename && $trick->getFirstFile() === null) {
+               $trick->setFirstFile([$primaryImageFilename]);
             }
             // Boucler sur les lien récupéré du formulaire
             foreach ($links as $link) {
@@ -125,19 +138,16 @@ final class TrickAjax extends AbstractController
 
             // Traitement si il n'y a pas eu d'image mis en avant
             if (!$image_empty) {
-               $length_files_entity = count($files_entity);
-               for ($i = 0; $i < $length_files_entity; $i++) {
-                  $file =  $files_entity[$i];
-                  $images[$i]->move($path, $file);
+               // Sauvegarder les images normales (pas l'image principale)
+               for ($i = 0; $i < count($files_entity); $i++) {
+                  $filename = $files_entity[$i];
+                  $imageObject = $image_objects[$i];
+                  $imageObject->move($path, $filename);
                }
             }
-            if ($primaryImage) {
-               $first_file = $trick->getFirstFile();
-
-               $primaryImage->move(
-                  $path,
-                  $first_file[0]
-               );
+            // Sauvegarder l'image principale si elle existe
+            if ($primaryImage && $primaryImageFilename) {
+               $primaryImage->move($path, $primaryImageFilename);
             }
             $this->addFlash('success', 'Article correctement crée');
             // Récupération des tricks
@@ -151,6 +161,12 @@ final class TrickAjax extends AbstractController
 
             return new JsonResponse(['tricks_html' => $tricks_html->getContent(), "page" => "tricks"]);
          } else {
+            // Debug: Log des erreurs de validation
+            error_log("Form validation failed");
+            foreach ($form->getErrors(true, false) as $error) {
+               error_log("Validation error: " . $error->getMessage());
+            }
+            
             // Récupération des erreurs en cas de validation échouée
             $errors = [];
             foreach ($form->getErrors(true, false) as $error) {
@@ -235,7 +251,8 @@ final class TrickAjax extends AbstractController
                         $trick->setFirstFile([$primaryImage]);
                      }
                   } else if (empty($first_file_arr)) {
-                    
+                     // Retirer l'image de la liste des fichiers normaux
+                     unset($existingFiles[array_search($primaryImage, $existingFiles)]);
                      $trick->setFirstFile([$primaryImage]);
                   }
                }
@@ -320,14 +337,12 @@ final class TrickAjax extends AbstractController
                   if (isset($hash_first_file)) {
                      if ($hash_file != $hash_first_file) {
                         $files_entity[] = $newFilename;
-                        $trick->setFiles($files_entity);
                      } else {
                         $new_first_file = [$newFilename];
                         $trick->setFirstFile($new_first_file);
                      }
                   } else {
                      $files_entity[] = $newFilename;
-                     $trick->setFiles($files_entity);
                   }
                   // Stockage de l'image
                   $image->move($path, $newFilename);
@@ -419,6 +434,14 @@ final class TrickAjax extends AbstractController
       $trick_id = $trick->getId();
       if ($this->isCsrfTokenValid('delete' . $trick_id, $request->getPayload()->getString('_token'))) {
          $slug = $trick->getSlug();
+         
+         // Supprimer le dossier des fichiers du trick
+         $filesystem = new Filesystem();
+         $trickFilesPath = $this->imageLocation . 'tricks\\' . $trick->getId();
+         if ($filesystem->exists($trickFilesPath)) {
+            $filesystem->remove($trickFilesPath);
+         }
+         
          $entityManager->remove($trick);
          $entityManager->flush();
          $tricks = $trickRepository->findAll();

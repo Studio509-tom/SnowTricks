@@ -13,9 +13,9 @@
 {{ form_row(form.content) }}
 {{ form_row(form.files)}}
 {% set value_form =  form.vars.value %}
-{{ form_row(form.primary_image)}}
+{{ form_row(form.primary_image, { 'attr': { 'id': 'primary-image' } })}}
 
-{{ form_row(form.links, { 'attr': { 'id': 'primary-image' , 'type' : 'hidden'} }) }}
+{{ form_row(form.links, { 'attr': { 'class': 'form-control' } }) }}
 <div class="parent-links"></div>
 <button class="btn btn-light add-links">Ajouter un lien</button>
 <div id="image-preview-existing">
