@@ -1,0 +1,65 @@
+# Configuration SymfonyInsight
+# Ce fichier configure l'environnement d'analyse pour SymfonyInsight
+
+# Version de PHP à utiliser
+php_version: 8.2
+
+# Variables d'environnement nécessaires
+environment_variables:
+    APP_ENV: prod
+    APP_DEBUG: 0
+    DATABASE_URL: "sqlite:///%kernel.project_dir%/var/data.db"
+    MAILER_DSN: "null://null"
+    APP_SECRET: "symfony-insight-secret-key-for-analysis"
+
+# Installation avec dépendances de développement
+composer_install_flags: "--no-dev --optimize-autoloader"
+
+# Scripts à exécuter avant l'installation des dépendances
+pre_composer_script: |
+    # Créer les dossiers nécessaires
+    mkdir -p var/cache var/log var/sessions
+    mkdir -p assets/files/users assets/files/tricks
+    mkdir -p public/files
+    
+    # Créer un fichier .env minimal pour l'analyse
+    echo "APP_ENV=prod" > .env.local
+    echo "APP_DEBUG=0" >> .env.local
+    echo "DATABASE_URL=\"sqlite:///%kernel.project_dir%/var/data.db\"" >> .env.local
+    echo "MAILER_DSN=null://null" >> .env.local
+    echo "APP_SECRET=symfony-insight-secret-key-for-analysis" >> .env.local
+
+# Scripts à exécuter après l'installation des dépendances
+post_composer_script: |
+    # Vider le cache
+    php bin/console cache:clear --env=prod --no-debug
+    
+    # Créer la base de données SQLite pour l'analyse
+    php bin/console doctrine:database:create --if-not-exists --env=prod --no-interaction
+    
+    # Exécuter les migrations
+    php bin/console doctrine:migrations:migrate --no-interaction --env=prod
+    
+    # Installer les assets si disponible
+    php bin/console asset-map:compile --env=prod || echo "Asset compilation skipped"
+    
+    # Réchauffer le cache
+    php bin/console cache:warmup --env=prod
+
+# Exclusions pour l'analyse
+excluded_paths:
+    - "var/*"
+    - "vendor/*"
+    - "tests/*"
+    - "assets/files/users/*"
+    - "assets/files/tricks/*"
+    - "assets/files/defaults/*"
+    - "docker/*"
+    - "*.log"
+    - ".env.local"
+    - ".env.*.local"
+
+# Règles spécifiques à ignorer si nécessaire
+rules:
+    # Ignorer les erreurs liées aux variables d'environnement manquantes en analyse
+    symfony.configuration.environment_variables: ~
