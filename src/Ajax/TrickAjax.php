@@ -274,9 +274,7 @@ final class TrickAjax extends AbstractController
          $images = $form->get('files')->getData();
 
          // Récupération des fichiers existants dans l'entité Trick
-         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-         // !!!!!!!!!!!!!!!!!!!!!!!!!!   A FAIRE PLUS TARD     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        
          // Récupération des liens du formulaires
          if (isset($request->get('trick')['links'])) {
             $links = $request->get('trick')['links'];
@@ -305,9 +303,7 @@ final class TrickAjax extends AbstractController
          date_default_timezone_set('Europe/Paris');
          $date_modify = new \DateTime(date('Y-m-d H:i:s'));
          $trick->setDateModify($date_modify);
-         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+         
 
          $files_entity = [];
 
